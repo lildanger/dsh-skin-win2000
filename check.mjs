@@ -168,7 +168,7 @@ assert(!/:where\([^)]*\)\{[^}]*border-radius/.test(css), "the square-corner rule
 assert(!/#(?:FFFFFF|ffffff)\b/.test(css), "no pure white may survive anywhere in the skin");
 assert(css.includes('font-family:"unsciiCJKV18",monospace'), "the bundled face must lead the type stack, with no unshipped family behind it");
 assert(css.includes('@font-face{font-family:"unsciiCJKV18";src:url("/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf") format("opentype")'), "the face must load from the package over the host route, not from a local install");
-assert(!/local\("unscii/.test(css), "local() would let the machine's own copy win, so rendering would differ per install");
+assert(/src:url\("\/api\/dsh-skin-win2000\/fonts\/unsciiCJKV18\.otf"\) format\("opentype"\),local\("unsciiCJKV18"\)/.test(css), "the packaged face must come first in src, with a local() copy only behind it as a fallback");
 assert(!/fonts\/(zpix|PixelCode|unscii-16-full)/.test(css), "no declaration may point at a font this package does not ship");
 assert(css.includes("font-synthesis:none !important"), "synthetic bold must stay off: the face carries one weight, and a synthesised stroke blurs the pixel grid");
 assert(css.includes("text-rendering:optimizeSpeed"), "the pixel face must snap glyphs to whole pixels: optimizeSpeed does, geometricPrecision explicitly does not");

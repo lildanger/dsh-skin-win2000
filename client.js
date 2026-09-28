@@ -408,7 +408,7 @@ body[data-dsh-skin="win2000"] *::-webkit-scrollbar,body[data-dsh-skin="win2000"]
 /* The bitmap face ships inside this package and is served by the host from it,
    so every installation renders identically instead of depending on locally
    installed fonts. */
-@font-face{font-family:"unsciiCJKV18";src:url("/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf") format("opentype");font-display:swap}
+@font-face{font-family:"unsciiCJKV18";src:url("/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf") format("opentype"),local("unsciiCJKV18");font-display:swap}
 body[data-dsh-skin="win2000"][data-dsh-skin-pixel],body[data-dsh-skin="win2000"][data-dsh-skin-pixel] :is(button,input,select,textarea,pre,code,div,span,p,a,label,h1,h2,h3,h4,table,th,td){font-family:"unsciiCJKV18",monospace !important;font-size:16px !important;line-height:1.25 !important;font-weight:normal !important;font-synthesis:none !important;-webkit-font-smoothing:none !important;text-rendering:optimizeSpeed !important}
 /* The face ships a single weight, so a request for bold (or italic) makes the
    browser synthesise an outline stroke — on a pixel grid that smears the glyph

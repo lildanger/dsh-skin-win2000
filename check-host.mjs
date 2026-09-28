@@ -21,7 +21,17 @@ apply({
     },
 });
 assert.ok(route, "apply must register a route");
-assert.equal(route.path, "/api/dsh-skin-win2000/fonts/", "the route prefix must match what the client requests");
+assert.equal(route.kind, "prefix", "the font route is a prefix route");
+assert.equal(
+    route.path,
+    "/api/dsh-skin-win2000/fonts",
+    "the prefix must carry no trailing slash: the server tests `startsWith(prefix + '/')`, so a stored slash can never match",
+);
+// Reproduce the server's own match rule, because a wrong prefix fails silently by
+// falling through to the SPA fallback, which answers 404.
+const matches = (prefix, pathname) => pathname === prefix || pathname.startsWith(`${prefix}/`);
+assert.ok(matches(route.path, "/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf"), "the prefix must match the URL the stylesheet requests");
+assert.ok(!matches("/api/dsh-skin-win2000/fonts/", "/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf"), "a trailing slash in the stored prefix is exactly the bug this guards against");
 
 /** Collect a response into { status, headers, bytes }. */
 const fetchRoute = (url) =>

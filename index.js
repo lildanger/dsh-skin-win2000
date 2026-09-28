@@ -39,10 +39,13 @@ export function apply(ctx) {
     ctx.effect(() =>
         ctx.webServer.register({
             kind: "prefix",
-            path: "/api/dsh-skin-win2000/fonts/",
+            /* No trailing slash: the server matches a prefix as `pathname ===
+               prefix || pathname.startsWith(prefix + "/")`, so a stored trailing
+               slash demands a double slash in the request and never matches. */
+            path: "/api/dsh-skin-win2000/fonts",
             handler: (req, res) => {
                 const url = new URL(req.url, "http://localhost");
-                const raw = url.pathname.replace(/^\/api\/dsh-skin-win2000\/fonts\//, "");
+                const raw = url.pathname.replace(/^\/api\/dsh-skin-win2000\/fonts\/?/, "");
                 const name = safeName(raw);
                 if (name === null) {
                     res.writeHead(400, { "content-type": "text/plain" });
