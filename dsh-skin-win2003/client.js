@@ -1,9 +1,9 @@
-// dsh-skin-win2000 — client half: the Windows 2003 (Luna) chrome.
+// dsh-skin-win2003 — client half: the Windows 2003 (Luna) chrome.
 //
 // The shipped Appearance row lists only light/dark/system, so a third-party
 // theme id has no seat there. The skin drives the document itself:
 //
-//   1. one stylesheet scoped to `body[data-dsh-skin="win2000"]`, carrying the
+//   1. one stylesheet scoped to `body[data-dsh-skin="win2003"]`, carrying the
 //      Windows 2003 palette over the design
 //      system's alias and specific tokens, plus what tokens cannot express:
 //      square corners, the classic bevels and 3D scrollbars. The type stack
@@ -18,15 +18,15 @@
 //      switch and the pixel-font switch. Both choices live in localStorage;
 //      turning the skin off leaves the stock look completely untouched.
 window.__ModuleLoader__.load({
-    id: "dsh-skin-win2000",
+    id: "dsh-skin-win2003",
     factory: (require) => {
         const React = require("react");
         const module = { exports: {} };
         const exports = module.exports;
 
         const SKIN_ATTRIBUTE = "data-dsh-skin";
-        const SKIN_VALUE = "win2000";
-        const STORAGE_KEY = "dsh.skin.win2000";
+        const SKIN_VALUE = "win2003";
+        const STORAGE_KEY = "dsh.skin.win2003";
         const PIXEL_VALUE = "unsciicjkv";
 
         /**
@@ -357,7 +357,7 @@ window.__ModuleLoader__.load({
             .split(LUNA_SLOT).join(declarations(LUNA_TOKENS));
 
         const STYLESHEET = `
-body[data-dsh-skin="win2000"]{${TOKEN_SLOT}
+body[data-dsh-skin="win2003"]{${TOKEN_SLOT}
   --dsh-skin-frame:4px;
   --dsh-skin-highlight:#EDEDED;
   --dsh-skin-sheen:#0A246A1a;
@@ -370,33 +370,33 @@ body[data-dsh-skin="win2000"]{${TOKEN_SLOT}
   font-size:11px;
   -webkit-font-smoothing:none;
 }
-body[data-dsh-skin="win2000"][data-dsh-skin-variant="luna"]{@@LUNA@@}
-body[data-dsh-skin="win2000"] *::selection{background:#0A246A !important;color:#EDEDED !important}
-body[data-dsh-skin="win2000"] :is(button,summary){box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080}
-body[data-dsh-skin="win2000"] :is(button,summary):hover{box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080,inset 0 0 0 100px var(--dsh-skin-sheen)}
-body[data-dsh-skin="win2000"] :is(button,summary):active,body[data-dsh-skin="win2000"] button[aria-pressed="true"]{box-shadow:inset 1px 1px 0 #000000,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #808080,inset -2px -2px 0 #DFDFDF,inset 0 0 0 100px var(--dsh-skin-sheen)}
-body[data-dsh-skin="win2000"] :is(button,summary):focus-visible{outline:1px dotted #000;outline-offset:-4px}
-body[data-dsh-skin="win2000"] :is(input,textarea,select,[role="textbox"],[contenteditable="true"]){box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF;background:#F4F4F4 !important;color:#000000 !important}
-body[data-dsh-skin="win2000"] :is(input,textarea,select,[role="textbox"],[contenteditable="true"]):focus{outline:none}
-body[data-dsh-skin="win2000"] :is([role="dialog"],[role="alertdialog"]){box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080}
-body[data-dsh-skin="win2000"] :is(pre,table,fieldset){box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF}
-body[data-dsh-skin="win2000"] :is(input,textarea,select,button,summary,pre,code,blockquote,table,th,td,fieldset,legend,[role="button"],[role="tab"],[role="dialog"],[role="menu"],[role="listbox"],[role="textbox"],[contenteditable="true"],[data-dsh-skin-panel],[data-dsh-skin-panel] *,[data-dsh-skin-window],[data-dsh-skin-window] *,[class*="Badge"],[class*="badge"]){border-radius:0 !important}
-body[data-dsh-skin="win2000"] :is([role="button"],[role="tab"],[role="option"],[role="menuitem"]):not([aria-pressed="true"]):not([aria-selected="true"]):not([class*="_selected"]){background:#D4D0C8 !important}
-body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]){background-color:#0A246A !important;color:#EDEDED !important}
-body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) :is(span,div,p,a,time){color:#EDEDED !important}
-body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) svg{color:#EDEDED !important}
-body[data-dsh-skin="win2000"] input[type="checkbox"],[data-dsh-skin-window] [data-dsh-skin-check] input{width:13px;height:13px;margin:0;appearance:none;-webkit-appearance:none;background:#F4F4F4 !important;box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF !important}
-body[data-dsh-skin="win2000"] input[type="checkbox"]:checked,[data-dsh-skin-window] [data-dsh-skin-check] input:checked{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='7' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M7 0H6v1H5v1H4v1H3v1H2V3H1V2H0v3h1v1h1v1h1V6h1V5h1V4h1V3h1V0z' fill='%23000'/%3E%3C/svg%3E") !important;background-position:center !important;background-repeat:no-repeat !important}
-body[data-dsh-skin="win2000"] *::-webkit-scrollbar{width:16px;height:16px}
-body[data-dsh-skin="win2000"] *::-webkit-scrollbar-track{background:#D4D0C8;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='2' height='2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M1 0H0v1h1v1h1V1H1V0z' fill='%23D4D0C8'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M2 0H1v1H0v1h1V1h1V0z' fill='%23F5F5F5'/%3E%3C/svg%3E");box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF}
-body[data-dsh-skin="win2000"] *::-webkit-scrollbar-thumb{background:#D4D0C8;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080}
-body[data-dsh-skin="win2000"] *::-webkit-scrollbar-thumb:hover{background:#E3E0D2}
-body[data-dsh-skin="win2000"] *::-webkit-scrollbar-thumb:active{background:#C8C4B4;box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF}
-body[data-dsh-skin="win2000"] *::-webkit-scrollbar-corner{background:#D4D0C8}
-body[data-dsh-skin="win2000"] *::-webkit-scrollbar-button{display:block;background-color:#D4D0C8;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080}
-body[data-dsh-skin="win2000"] *::-webkit-scrollbar-button:vertical:start{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M8 5H7v1H6v1H5v1H4v1h8V9h-1V8h-1V7H9V6H8V5z' fill='%23000'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
-body[data-dsh-skin="win2000"] *::-webkit-scrollbar-button:vertical:end{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M11 6H4v1h1v1h1v1h1v1h1V9h1V8h1V7h1V6z' fill='%23000'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
-body[data-dsh-skin="win2000"] *::-webkit-scrollbar,body[data-dsh-skin="win2000"] *::-webkit-scrollbar-thumb,body[data-dsh-skin="win2000"] *::-webkit-scrollbar-track,body[data-dsh-skin="win2000"] *::-webkit-scrollbar-button,body[data-dsh-skin="win2000"] *::-webkit-scrollbar-corner{border-radius:0 !important}
+body[data-dsh-skin="win2003"][data-dsh-skin-variant="luna"]{@@LUNA@@}
+body[data-dsh-skin="win2003"] *::selection{background:#0A246A !important;color:#EDEDED !important}
+body[data-dsh-skin="win2003"] :is(button,summary){box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080}
+body[data-dsh-skin="win2003"] :is(button,summary):hover{box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080,inset 0 0 0 100px var(--dsh-skin-sheen)}
+body[data-dsh-skin="win2003"] :is(button,summary):active,body[data-dsh-skin="win2003"] button[aria-pressed="true"]{box-shadow:inset 1px 1px 0 #000000,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #808080,inset -2px -2px 0 #DFDFDF,inset 0 0 0 100px var(--dsh-skin-sheen)}
+body[data-dsh-skin="win2003"] :is(button,summary):focus-visible{outline:1px dotted #000;outline-offset:-4px}
+body[data-dsh-skin="win2003"] :is(input,textarea,select,[role="textbox"],[contenteditable="true"]){box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF;background:#F4F4F4 !important;color:#000000 !important}
+body[data-dsh-skin="win2003"] :is(input,textarea,select,[role="textbox"],[contenteditable="true"]):focus{outline:none}
+body[data-dsh-skin="win2003"] :is([role="dialog"],[role="alertdialog"]){box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080}
+body[data-dsh-skin="win2003"] :is(pre,table,fieldset){box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF}
+body[data-dsh-skin="win2003"] :is(input,textarea,select,button,summary,pre,code,blockquote,table,th,td,fieldset,legend,[role="button"],[role="tab"],[role="dialog"],[role="menu"],[role="listbox"],[role="textbox"],[contenteditable="true"],[data-dsh-skin-panel],[data-dsh-skin-panel] *,[data-dsh-skin-window],[data-dsh-skin-window] *,[class*="Badge"],[class*="badge"]){border-radius:0 !important}
+body[data-dsh-skin="win2003"] :is([role="button"],[role="tab"],[role="option"],[role="menuitem"]):not([aria-pressed="true"]):not([aria-selected="true"]):not([class*="_selected"]){background:#D4D0C8 !important}
+body[data-dsh-skin="win2003"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]){background-color:#0A246A !important;color:#EDEDED !important}
+body[data-dsh-skin="win2003"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) :is(span,div,p,a,time){color:#EDEDED !important}
+body[data-dsh-skin="win2003"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) svg{color:#EDEDED !important}
+body[data-dsh-skin="win2003"] input[type="checkbox"],[data-dsh-skin-window] [data-dsh-skin-check] input{width:13px;height:13px;margin:0;appearance:none;-webkit-appearance:none;background:#F4F4F4 !important;box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF !important}
+body[data-dsh-skin="win2003"] input[type="checkbox"]:checked,[data-dsh-skin-window] [data-dsh-skin-check] input:checked{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='7' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M7 0H6v1H5v1H4v1H3v1H2V3H1V2H0v3h1v1h1v1h1V6h1V5h1V4h1V3h1V0z' fill='%23000'/%3E%3C/svg%3E") !important;background-position:center !important;background-repeat:no-repeat !important}
+body[data-dsh-skin="win2003"] *::-webkit-scrollbar{width:16px;height:16px}
+body[data-dsh-skin="win2003"] *::-webkit-scrollbar-track{background:#D4D0C8;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='2' height='2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M1 0H0v1h1v1h1V1H1V0z' fill='%23D4D0C8'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M2 0H1v1H0v1h1V1h1V0z' fill='%23F5F5F5'/%3E%3C/svg%3E");box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF}
+body[data-dsh-skin="win2003"] *::-webkit-scrollbar-thumb{background:#D4D0C8;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080}
+body[data-dsh-skin="win2003"] *::-webkit-scrollbar-thumb:hover{background:#E3E0D2}
+body[data-dsh-skin="win2003"] *::-webkit-scrollbar-thumb:active{background:#C8C4B4;box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF}
+body[data-dsh-skin="win2003"] *::-webkit-scrollbar-corner{background:#D4D0C8}
+body[data-dsh-skin="win2003"] *::-webkit-scrollbar-button{display:block;background-color:#D4D0C8;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080}
+body[data-dsh-skin="win2003"] *::-webkit-scrollbar-button:vertical:start{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M8 5H7v1H6v1H5v1H4v1h8V9h-1V8h-1V7H9V6H8V5z' fill='%23000'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
+body[data-dsh-skin="win2003"] *::-webkit-scrollbar-button:vertical:end{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M11 6H4v1h1v1h1v1h1v1h1V9h1V8h1V7h1V6z' fill='%23000'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
+body[data-dsh-skin="win2003"] *::-webkit-scrollbar,body[data-dsh-skin="win2003"] *::-webkit-scrollbar-thumb,body[data-dsh-skin="win2003"] *::-webkit-scrollbar-track,body[data-dsh-skin="win2003"] *::-webkit-scrollbar-button,body[data-dsh-skin="win2003"] *::-webkit-scrollbar-corner{border-radius:0 !important}
 [data-dsh-skin-panel]{position:fixed;right:12px;bottom:12px;z-index:30;display:flex;flex-direction:column;gap:3px;align-items:stretch;color:#000 !important;background:#D4D0C8 !important;border:0 !important;border-radius:0 !important;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080 !important;padding:4px;min-width:148px;font-family:inherit;font-size:11px}
 [data-dsh-skin-panel] > button{display:flex;align-items:center;gap:6px;padding:5px 10px;text-align:left;font-family:inherit;font-size:11px;color:inherit;background:#D4D0C8 !important;border:0 !important;border-radius:0 !important;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080 !important;cursor:pointer}
 [data-dsh-skin-panel] > button:hover{box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080,inset 0 0 0 100px #0A246A1a}
@@ -409,14 +409,14 @@ body[data-dsh-skin="win2000"] *::-webkit-scrollbar,body[data-dsh-skin="win2000"]
 @font-face{font-family:"Pixel Code";src:local("Pixel Code"),local("PixelCode"),local("Pixel Code Regular"),url("/api/dsh-skin-win2000/fonts/PixelCode.ttf") format("truetype");font-display:swap}
 @font-face{font-family:"unscii-16-full";src:local("unscii-16-full"),local("unscii"),url("/api/dsh-skin-win2000/fonts/unscii-16-full-orig.ttf") format("truetype");font-display:swap}
 @font-face{font-family:"unsciiCJKV18";src:local("unsciiCJKV18"),local("unsciiCJKV18 Regular"),url("/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf") format("opentype");font-display:swap}
-body[data-dsh-skin="win2000"][data-dsh-skin-pixel],body[data-dsh-skin="win2000"][data-dsh-skin-pixel] :is(button,input,select,textarea,pre,code,div,span,p,a,label,h1,h2,h3,h4,table,th,td){font-family:"unsciiCJKV18","unsciiCJKV","unscii-16-full","unscii","unscii-16-full HD",monospace !important;font-size:16px !important;line-height:1.25 !important;font-weight:normal !important;font-synthesis:none !important;-webkit-font-smoothing:none !important;text-rendering:optimizeSpeed !important}
+body[data-dsh-skin="win2003"][data-dsh-skin-pixel],body[data-dsh-skin="win2003"][data-dsh-skin-pixel] :is(button,input,select,textarea,pre,code,div,span,p,a,label,h1,h2,h3,h4,table,th,td){font-family:"unsciiCJKV18","unsciiCJKV","unscii-16-full","unscii","unscii-16-full HD",monospace !important;font-size:16px !important;line-height:1.25 !important;font-weight:normal !important;font-synthesis:none !important;-webkit-font-smoothing:none !important;text-rendering:optimizeSpeed !important}
 /* The face ships a single weight, so a request for bold (or italic) makes the
    browser synthesise an outline stroke — on a pixel grid that smears the glyph
    into grey. The font-synthesis:none above is inherited, so no descendant can
    trigger it; emphasis is instead drawn the way pixel type does it, by
    overprinting the glyph one pixel to the right. Sharper than synthetic bold,
    and it keeps <strong> visibly heavier than body text. */
-body[data-dsh-skin="win2000"][data-dsh-skin-pixel] :is(strong,b){text-shadow:1px 0 0 currentColor !important}
+body[data-dsh-skin="win2003"][data-dsh-skin-pixel] :is(strong,b){text-shadow:1px 0 0 currentColor !important}
 [data-dsh-skin-panel] hr{margin:3px 6px;border:0;border-top:1px solid #808080;border-bottom:1px solid #EDEDED}
 [data-dsh-skin-panel] [data-dsh-skin-title]{padding:3px 10px;color:#000}
 [data-dsh-skin-panelbar]{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 3px 3px 7px;margin:0 0 3px;background:linear-gradient(90deg,#0A246A 0%,#A6CAF0 100%);cursor:move;touch-action:none;user-select:none}
@@ -452,31 +452,31 @@ body[data-dsh-skin="win2000"][data-dsh-skin-pixel] :is(strong,b){text-shadow:1px
 [data-dsh-skin-window] [data-dsh-skin-actions] button:active{box-shadow:inset 1px 1px 0 #000000,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #808080,inset -2px -2px 0 #DFDFDF}
 [data-dsh-skin-window] [data-dsh-skin-actions] button:focus-visible{outline:1px dotted #000;outline-offset:-4px}
 [data-dsh-skin-panel] *,[data-dsh-skin-window] *{border-radius:0 !important}
-body[data-dsh-skin="win2000"] :is(input,textarea,select,button,summary,th,td,legend,[role="button"],[role="tab"],[role="option"],[role="textbox"],[contenteditable="true"],[data-dsh-skin-label],[data-dsh-skin-status] span,[data-dsh-skin-input]){padding-inline-start:6px;padding-inline-end:6px;padding-block-start:3px;padding-block-end:3px}
-body[data-dsh-skin="win2000"] pre{padding:10px 12px !important;line-height:1.45 !important}
-body[data-dsh-skin="win2000"] code:not(pre code){padding:1px 4px !important}
-body[data-dsh-skin="win2000"] blockquote{padding:4px 12px !important;border-left:2px solid #808080 !important;margin:8px 0 !important}
+body[data-dsh-skin="win2003"] :is(input,textarea,select,button,summary,th,td,legend,[role="button"],[role="tab"],[role="option"],[role="textbox"],[contenteditable="true"],[data-dsh-skin-label],[data-dsh-skin-status] span,[data-dsh-skin-input]){padding-inline-start:6px;padding-inline-end:6px;padding-block-start:3px;padding-block-end:3px}
+body[data-dsh-skin="win2003"] pre{padding:10px 12px !important;line-height:1.45 !important}
+body[data-dsh-skin="win2003"] code:not(pre code){padding:1px 4px !important}
+body[data-dsh-skin="win2003"] blockquote{padding:4px 12px !important;border-left:2px solid #808080 !important;margin:8px 0 !important}
 /* Tooltip bubbles read their text colour from the static ramp's brightest step
    (--dsw-static-neutral-bluish-00), which this skin keeps light on purpose; the
    bubble is the one surface that needs dark text, so it is named here. */
-body[data-dsh-skin="win2000"] [class*="bubble"]{color:#000 !important;background:#FFFFE1 !important;border-radius:0 !important}
+body[data-dsh-skin="win2003"] [class*="bubble"]{color:#000 !important;background:#FFFFE1 !important;border-radius:0 !important}
 /* Tool and command cards, popover cards, and hover cards: text must be black on light grey background */
-body[data-dsh-skin="win2000"] :is([class*="_card"],[class*="hoverContent"],[class*="hoverTitle"],[class*="hoverTime"],[class*="hoverStatus"],[class*="popup"],[class*="Popover"],[role="tooltip"]){color:#000000 !important;border-radius:0 !important}
-body[data-dsh-skin="win2000"] :is([class*="_card"],[class*="hoverContent"],[class*="popup"],[class*="Popover"],[role="tooltip"]) :is(div,span,p,a,time,label,h1,h2,h3,h4){color:#000000 !important}
-body[data-dsh-skin="win2000"] [class*="_card"]{background:#D4D0C8 !important;color:#000000 !important;border-radius:0 !important;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080 !important}
-body[data-dsh-skin="win2000"] :is([class*="_card"],[class*="Card"]){--changes-fill:#D4D0C8 !important;--changes-hover:#C8C4BC !important}
+body[data-dsh-skin="win2003"] :is([class*="_card"],[class*="hoverContent"],[class*="hoverTitle"],[class*="hoverTime"],[class*="hoverStatus"],[class*="popup"],[class*="Popover"],[role="tooltip"]){color:#000000 !important;border-radius:0 !important}
+body[data-dsh-skin="win2003"] :is([class*="_card"],[class*="hoverContent"],[class*="popup"],[class*="Popover"],[role="tooltip"]) :is(div,span,p,a,time,label,h1,h2,h3,h4){color:#000000 !important}
+body[data-dsh-skin="win2003"] [class*="_card"]{background:#D4D0C8 !important;color:#000000 !important;border-radius:0 !important;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080 !important}
+body[data-dsh-skin="win2003"] :is([class*="_card"],[class*="Card"]){--changes-fill:#D4D0C8 !important;--changes-hover:#C8C4BC !important}
 /* Sidebar session icon buttons: keep clean, centered, and visible icons */
 /* Stop-generating shares the composer's primary button class with Send; only its
    accessible label tells them apart, so the red is keyed on the label. */
-body[data-dsh-skin="win2000"] button[aria-label="停止生成"],body[data-dsh-skin="win2000"] button[aria-label="Stop generating"]{background:#CC0000 !important;color:#EDEDED !important;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080 !important}
-body[data-dsh-skin="win2000"] button[aria-label="停止生成"]:hover,body[data-dsh-skin="win2000"] button[aria-label="Stop generating"]:hover{background:#E00000 !important}
-body[data-dsh-skin="win2000"] button[aria-label="停止生成"]:active,body[data-dsh-skin="win2000"] button[aria-label="Stop generating"]:active{background:#A80000 !important;box-shadow:inset 1px 1px 0 #000000,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #808080,inset -2px -2px 0 #DFDFDF !important}
-body[data-dsh-skin="win2000"] button[aria-label="停止生成"] svg,body[data-dsh-skin="win2000"] button[aria-label="Stop generating"] svg{color:#EDEDED !important}
+body[data-dsh-skin="win2003"] button[aria-label="停止生成"],body[data-dsh-skin="win2003"] button[aria-label="Stop generating"]{background:#CC0000 !important;color:#EDEDED !important;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080 !important}
+body[data-dsh-skin="win2003"] button[aria-label="停止生成"]:hover,body[data-dsh-skin="win2003"] button[aria-label="Stop generating"]:hover{background:#E00000 !important}
+body[data-dsh-skin="win2003"] button[aria-label="停止生成"]:active,body[data-dsh-skin="win2003"] button[aria-label="Stop generating"]:active{background:#A80000 !important;box-shadow:inset 1px 1px 0 #000000,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #808080,inset -2px -2px 0 #DFDFDF !important}
+body[data-dsh-skin="win2003"] button[aria-label="停止生成"] svg,body[data-dsh-skin="win2003"] button[aria-label="Stop generating"] svg{color:#EDEDED !important}
 /* Icon buttons: compact raised squares, restored after the last round. */
-body[data-dsh-skin="win2000"] [class*="iconButton"],body[data-dsh-skin="win2000"] [class*="IconButton"]{padding:0 !important;min-width:18px !important;min-height:18px !important;width:18px !important;height:18px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;background:#D4D0C8 !important;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080 !important}
-body[data-dsh-skin="win2000"] [class*="iconButton"]:hover,body[data-dsh-skin="win2000"] [class*="IconButton"]:hover{box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080,inset 0 0 0 100px #0A246A1a !important}
-body[data-dsh-skin="win2000"] [class*="iconButton"]:active,body[data-dsh-skin="win2000"] [class*="IconButton"]:active{box-shadow:inset 1px 1px 0 #000000,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #808080,inset -2px -2px 0 #DFDFDF !important}
-body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2000"] [class*="IconButton"] svg{width:12px;height:12px;color:#000000}
+body[data-dsh-skin="win2003"] [class*="iconButton"],body[data-dsh-skin="win2003"] [class*="IconButton"]{padding:0 !important;min-width:18px !important;min-height:18px !important;width:18px !important;height:18px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;background:#D4D0C8 !important;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080 !important}
+body[data-dsh-skin="win2003"] [class*="iconButton"]:hover,body[data-dsh-skin="win2003"] [class*="IconButton"]:hover{box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080,inset 0 0 0 100px #0A246A1a !important}
+body[data-dsh-skin="win2003"] [class*="iconButton"]:active,body[data-dsh-skin="win2003"] [class*="IconButton"]:active{box-shadow:inset 1px 1px 0 #000000,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #808080,inset -2px -2px 0 #DFDFDF !important}
+body[data-dsh-skin="win2003"] [class*="iconButton"] svg,body[data-dsh-skin="win2003"] [class*="IconButton"] svg{width:12px;height:12px;color:#000000}
 `;
 
 
@@ -648,7 +648,7 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
         }
 
         /** Panel chrome state: where the user dragged it, and whether it is folded. */
-        const UI_KEY = "dsh.skin.win2000.ui";
+        const UI_KEY = "dsh.skin.win2003.ui";
         const readUi = () => {
             try {
                 const parsed = JSON.parse(localStorage.getItem(UI_KEY) ?? "{}");
@@ -809,10 +809,10 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
                         /* nothing to release when storage is unavailable */
                     }
                 };
-            }, "dsh-skin-win2000: stylesheet and settings");
+            }, "dsh-skin-win2003: stylesheet and settings");
             ctx.slots.inject("shell.overlay", () => ctx.slots.register({
                 name: "shell.overlay",
-                id: "dsh-skin-win2000-settings",
+                id: "dsh-skin-win2003-settings",
                 label: () => "Windows 皮肤设置",
             }, SkinSettings));
         }

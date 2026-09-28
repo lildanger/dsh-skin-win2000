@@ -1,0 +1,44 @@
+{
+  "name": "dsh-skin-win2003",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Windows Server 2003 skin for the DSH Web GUI: metric-accurate grey chrome, two-tone gradient title bars, 1px bevels, square corners and a 16px scrollbar. 给 DSH Web GUI 换上 Windows Server 2003 经典外观。",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek",
+    "deepseek-harness",
+    "harness",
+    "skin",
+    "theme",
+    "windows",
+    "windows-server-2003",
+    "win2003",
+    "luna",
+    "retro",
+    "classic",
+    "web-gui",
+    "ui",
+    "css"
+  ],
+  "meta": {
+    "title": "Windows Server 2003 Skin",
+    "description": "把 DSH Web GUI 换成 Windows Server 2003 经典界面：经典中性灰控件、双色渐变标题栏、1px 立体浮雕、绝对直角、16px 经典滚动条。"
+  },
+  "license": "MIT"
+}
