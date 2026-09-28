@@ -405,11 +405,11 @@ body[data-dsh-skin="win2000"] *::-webkit-scrollbar,body[data-dsh-skin="win2000"]
 [data-dsh-skin-panel] > button[disabled]{color:#808080;background:#D4D0C8 !important;cursor:default}
 [data-dsh-skin-panel] > button span[data-dsh-skin-mark]{flex:none;width:11px;height:11px;background:#F4F4F4;box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF !important;display:inline-flex;align-items:center;justify-content:center}
 [data-dsh-skin-panel] > button[aria-pressed="true"] span[data-dsh-skin-mark]:not([style*="background"]){background-color:#F4F4F4 !important;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='7' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M7 0H6v1H5v1H4v1H3v1H2V3H1V2H0v3h1v1h1v1h1V6h1V5h1V4h1V3h1V0z' fill='%23000'/%3E%3C/svg%3E") !important;background-position:center !important;background-repeat:no-repeat !important}
-@font-face{font-family:"Zpix";src:local("Zpix"),local("zpix"),local("Zpix Regular"),url("/api/dsh-skin-win2000/fonts/zpix.ttf") format("truetype");font-display:swap}
-@font-face{font-family:"Pixel Code";src:local("Pixel Code"),local("PixelCode"),local("Pixel Code Regular"),url("/api/dsh-skin-win2000/fonts/PixelCode.ttf") format("truetype");font-display:swap}
-@font-face{font-family:"unscii-16-full";src:local("unscii-16-full"),local("unscii"),url("/api/dsh-skin-win2000/fonts/unscii-16-full-orig.ttf") format("truetype");font-display:swap}
-@font-face{font-family:"unsciiCJKV18";src:local("unsciiCJKV18"),local("unsciiCJKV18 Regular"),url("/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf") format("opentype");font-display:swap}
-body[data-dsh-skin="win2000"][data-dsh-skin-pixel],body[data-dsh-skin="win2000"][data-dsh-skin-pixel] :is(button,input,select,textarea,pre,code,div,span,p,a,label,h1,h2,h3,h4,table,th,td){font-family:"unsciiCJKV18","unsciiCJKV","unscii-16-full","unscii","unscii-16-full HD",monospace !important;font-size:16px !important;line-height:1.25 !important;font-weight:normal !important;font-synthesis:none !important;-webkit-font-smoothing:none !important;text-rendering:optimizeSpeed !important}
+/* The bitmap face ships inside this package and is served by the host from it,
+   so every installation renders identically instead of depending on locally
+   installed fonts. */
+@font-face{font-family:"unsciiCJKV18";src:url("/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf") format("opentype");font-display:swap}
+body[data-dsh-skin="win2000"][data-dsh-skin-pixel],body[data-dsh-skin="win2000"][data-dsh-skin-pixel] :is(button,input,select,textarea,pre,code,div,span,p,a,label,h1,h2,h3,h4,table,th,td){font-family:"unsciiCJKV18",monospace !important;font-size:16px !important;line-height:1.25 !important;font-weight:normal !important;font-synthesis:none !important;-webkit-font-smoothing:none !important;text-rendering:optimizeSpeed !important}
 /* The face ships a single weight, so a request for bold (or italic) makes the
    browser synthesise an outline stroke — on a pixel grid that smears the glyph
    into grey. The font-synthesis:none above is inherited, so no descendant can

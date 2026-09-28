@@ -1,58 +1,68 @@
 import { createReadStream, existsSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join, normalize, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
 
+/** Required host service: without it there is nowhere to serve fonts from. */
 export const inject = ["webServer"];
 
-const FONT_MAP = {
-    "zpix.ttf": [
-        join(homedir(), "AppData", "Local", "Microsoft", "Windows", "Fonts", "zpix.ttf"),
-        "D:\\fontwork\\zpix.ttf"
-    ],
-    "unscii-16-full-orig.ttf": [
-        "D:\\fontwork\\unscii-16-full-orig.ttf",
-        join(homedir(), "AppData", "Local", "Microsoft", "Windows", "Fonts", "unscii-16-full-orig.ttf")
-    ],
-    "unsciiCJKV.otf": [
-        join(homedir(), "AppData", "Local", "Microsoft", "Windows", "Fonts", "unsciiCJKV.otf"),
-        "D:\\fontwork\\unsciiCJKV.otf"
-    ],
-    "unsciiCJKV18.otf": [
-        join(homedir(), "AppData", "Local", "Microsoft", "Windows", "Fonts", "unsciiCJKV18.otf"),
-        "D:\\fontwork\\unsciiCJKV18.otf"
-    ]
+/** This package's own directory, so the bundled font is found after install. */
+const PACKAGE_ROOT = dirname(fileURLToPath(import.meta.url));
+const BUNDLED = join(PACKAGE_ROOT, "fonts");
+
+/**
+ * Font resolution order. The bundled copy comes first so every installation
+ * renders identically; the author's local font directories remain as a fallback
+ * for development, where a family may exist that this package does not ship.
+ */
+const LOCAL_DIRS = [
+    join(homedir(), "AppData", "Local", "Microsoft", "Windows", "Fonts"),
+    "D:\\fontwork",
+];
+
+/** Only a bare file name is accepted, which is what keeps the path from escaping. */
+const safeName = (raw) => {
+    let decoded;
+    try {
+        decoded = decodeURIComponent(raw);
+    } catch {
+        return null;
+    }
+    if (decoded === "" || decoded === "." || decoded === "..") return null;
+    const base = normalize(decoded).replace(/^([/\\])+/, "");
+    if (base === "" || base === "." || base === "..") return null;
+    if (base.includes("..") || base.includes(sep) || base.includes("/")) return null;
+    return base;
 };
 
 export function apply(ctx) {
-    ctx.effect(() => {
-        return ctx.webServer.register({
+    ctx.effect(() =>
+        ctx.webServer.register({
             kind: "prefix",
             path: "/api/dsh-skin-win2000/fonts/",
             handler: (req, res) => {
                 const url = new URL(req.url, "http://localhost");
-                const name = url.pathname.replace(/^\/api\/dsh-skin-win2000\/fonts\//, "");
-                const candidates = FONT_MAP[name] || [
-                    join(homedir(), "AppData", "Local", "Microsoft", "Windows", "Fonts", name),
-                    join("D:\\fontwork", name)
-                ];
-                let found = null;
-                for (const c of candidates) {
-                    if (existsSync(c)) { found = c; break; }
+                const raw = url.pathname.replace(/^\/api\/dsh-skin-win2000\/fonts\//, "");
+                const name = safeName(raw);
+                if (name === null) {
+                    res.writeHead(400, { "content-type": "text/plain" });
+                    res.end("Bad font name");
+                    return;
                 }
-                if (!found) {
+                const candidates = [join(BUNDLED, name), ...LOCAL_DIRS.map((dir) => join(dir, name))];
+                const found = candidates.find((candidate) => existsSync(candidate));
+                if (found === undefined) {
                     res.writeHead(404, { "content-type": "text/plain" });
                     res.end("Font not found");
                     return;
                 }
-                const ext = name.endsWith(".otf") ? "font/otf" : "font/ttf";
                 res.writeHead(200, {
-                    "content-type": ext,
-                    "cache-control": "public, max-age=86400",
-                    "access-control-allow-origin": "*"
+                    "content-type": name.endsWith(".otf") ? "font/otf" : "font/ttf",
+                    "cache-control": "public, max-age=604800, immutable",
+                    "access-control-allow-origin": "*",
                 });
                 createReadStream(found).pipe(res);
-            }
-        });
-    });
+            },
+        }),
+    );
 }
-

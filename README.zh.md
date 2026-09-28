@@ -95,9 +95,14 @@ dsh plugin --profile web add link:/path/to/dsh-skin-win2000
 
 ### 关于字体
 
-皮肤**不设置任何字体**（唯一例外是窗口标题按钮的 Marlett 符号字形）。字号只有度量表要求的 `font-size: 11px` 这一条，而你在 DSH 设置里选的字号是内联样式，优先级更高——**你的字体设置永远赢**。
+皮肤**自带**它渲染文字用的点阵字体：`fonts/unsciiCJKV18.otf`（6.37 MB）随包分发，由宿主半侧在 `/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf` 提供。
 
-所以换到别人机器上，字体观感就是你自己的设置：用系统字体、用等宽字体、用点阵字体都成立，皮肤的立体边、直角、配色与字体无关。
+- `@font-face` **不写 `local()`**，所以机器上装了什么字体都不会抢先——每台机器渲染结果一致
+- 只声明这一个字体族，字体栈为 `"unsciiCJKV18", monospace`，不再引用包里没有的字体
+- 响应带 `cache-control: public, max-age=604800, immutable`，浏览器每周最多下载一次；`font-display: swap` 保证字体到达前文字可见
+- 字体许可状态见 [fonts/README.md](fonts/README.md)：该字体的再分发条款**没有任何地方写明**，上游 `viznut/unscii` 也未声明许可证。如需替换或移除，该文件里写了做法
+
+皮肤其余部分**不设置字体**：唯一例外是窗口标题按钮的 Marlett 符号字形。如果你关掉面板里的「点阵字体」开关，界面就完全用你自己的字体设置。
 
 ## 使用
 
@@ -158,6 +163,7 @@ dsh-skin-win2000/            ← 仓库根就是包本体
 ├── check.mjs                最小可运行检查
 ├── verify-metrics.mjs       度量表配色回归
 ├── tools/capture.mjs        通过 CDP 抓取运行中界面的真实截图
+├── fonts/unsciiCJKV18.otf     随包分发的点阵字体（6.37 MB）
 ├── docs/screenshots/        README 用的三张实拍 PNG
 ├── HANDOFF.md               交接文档：结构、行号、踩坑记录
 └── workspace/               本地脚本与锁文件（不随包发布）

@@ -52,11 +52,12 @@
     "client.js",
     "index.js",
     "cordis.patch.yml",
+    "fonts",
+    "docs",
+    "tools",
     "README.md",
     "README.zh.md",
-    "LICENSE",
-    "docs",
-    "tools"
+    "LICENSE"
   ],
   "engines": {
     "node": ">=20"

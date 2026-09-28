@@ -95,9 +95,14 @@ Reload the page. **If nothing changes, force a reload with `Ctrl+Shift+R`** — 
 
 ### About fonts
 
-The skin **sets no font** (the only exception is the Marlett symbol glyphs in the window title buttons). The single type rule it carries is the metric table's `font-size: 11px`, and the size you pick in DSH settings is written as an inline style with higher precedence — **your font settings always win**.
+The skin **ships the bitmap face it renders with**: `fonts/unsciiCJKV18.otf` (6.37 MB) travels inside the package, served by the host half at `/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf`.
 
-So on someone else's machine the type rendering is whatever they configured: system fonts, monospace, or a bitmap font all work, because the bevels, square corners and colours are independent of the typeface.
+- The `@font-face` declares **no `local()` source**, so a copy installed on the machine can never take precedence — every installation renders identically
+- Only that one family is declared, and the stack is `"unsciiCJKV18", monospace`; no family this package does not carry is named
+- The response carries `cache-control: public, max-age=604800, immutable`, so a browser fetches it at most once a week, and `font-display: swap` keeps text visible until it lands
+- Licence status is in [fonts/README.md](fonts/README.md): the face's redistribution terms are **documented nowhere**, and upstream `viznut/unscii` declares no licence either. That file also says how to replace or remove it
+
+The rest of the skin **sets no font** (the only exception is the Marlett symbol glyphs in the window title buttons). Switch the panel's pixel-font toggle off and the interface uses your own font settings entirely.
 
 ## Using it
 
@@ -158,6 +163,7 @@ dsh-skin-win2000/            ← the repository root IS the package
 ├── check.mjs                minimal runnable check
 ├── verify-metrics.mjs       colour regression against the metric table
 ├── tools/capture.mjs        captures the README images over CDP
+├── fonts/unsciiCJKV18.otf     the bundled bitmap face (6.37 MB)
 ├── docs/screenshots/        the three captured PNGs
 ├── HANDOFF.md               handoff notes: structure, line numbers, pitfalls
 └── workspace/               local scripts and lockfiles (not published)
