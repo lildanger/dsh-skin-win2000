@@ -477,8 +477,8 @@ body[data-dsh-skin="win2000"] [class*="bubble"]{color:#000 !important;background
 /* Tool and command cards, popover cards, and hover cards: text must be black on light grey background */
 body[data-dsh-skin="win2000"] :is([class*="_card"],[class*="hoverContent"],[class*="hoverTitle"],[class*="hoverTime"],[class*="hoverStatus"],[class*="popup"],[class*="Popover"],[role="tooltip"]){color:#000000 !important;border-radius:0 !important}
 body[data-dsh-skin="win2000"] :is([class*="_card"],[class*="hoverContent"],[class*="popup"],[class*="Popover"],[role="tooltip"]) :is(div,span,p,a,time,label,h1,h2,h3,h4){color:#000000 !important}
-body[data-dsh-skin="win2000"] [class*="_card"]{background:#D4D0C8 !important;color:#000000 !important;border-radius:0 !important;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080 !important}
-body[data-dsh-skin="win2000"] :is([class*="_card"],[class*="Card"]){--changes-fill:#D4D0C8 !important;--changes-hover:#C8C4BC !important}
+body[data-dsh-skin="win2000"] [class*="_card"]{background:#C8C4BC !important;color:#000000 !important;border-radius:0 !important;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080 !important}
+body[data-dsh-skin="win2000"] :is([class*="_card"],[class*="Card"]){--changes-fill:#BFBBB2 !important;--changes-hover:#B4B0A7 !important}
 /* Sidebar session icon buttons: keep clean, centered, and visible icons */
 /* Stop-generating shares the composer's primary button class with Send; only its
    accessible label tells them apart, so the red is keyed on the label. */
@@ -697,6 +697,8 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
             const [ui, setUi] = React.useState(readUi);
             const [specimen, setSpecimen] = React.useState(false);
             const drag = React.useRef(null);
+            /** Set when a gesture was a drag, so its trailing click is ignored. */
+            const dragged = React.useRef(false);
 
             const update = (patch) => {
                 const next = { ...settings, ...patch };
@@ -715,22 +717,36 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
                 if (!fromMini && event.target.closest("[data-dsh-skin-fold]") !== null) return;
                 const panel = event.currentTarget.parentElement;
                 const rect = panel.getBoundingClientRect();
-                drag.current = { dx: event.clientX - rect.left, dy: event.clientY - rect.top };
+                drag.current = {
+                    dx: event.clientX - rect.left,
+                    dy: event.clientY - rect.top,
+                    startX: event.clientX,
+                    startY: event.clientY,
+                    moved: false,
+                };
                 event.currentTarget.setPointerCapture(event.pointerId);
             };
             const onPointerMove = (event) => {
                 if (drag.current === null) return;
+                if (Math.abs(event.clientX - drag.current.startX) > 3 || Math.abs(event.clientY - drag.current.startY) > 3) {
+                    drag.current.moved = true;
+                }
                 const x = Math.min(Math.max(0, event.clientX - drag.current.dx), window.innerWidth - 80);
                 const y = Math.min(Math.max(0, event.clientY - drag.current.dy), window.innerHeight - 40);
                 setUi((current) => ({ ...current, x, y }));
             };
             const onPointerUp = (event) => {
                 if (drag.current === null) return;
+                const moved = drag.current.moved;
                 drag.current = null;
                 event.currentTarget.releasePointerCapture(event.pointerId);
+                if (!moved) return;
                 const panel = event.currentTarget.parentElement;
                 const rect = panel.getBoundingClientRect();
                 chrome({ x: rect.left, y: rect.top });
+                // The browser still emits a click after this pointerup; the mini
+                // button would read it as a stage change and reopen the panel.
+                dragged.current = true;
             };
 
             // Viewport clamping: ensures panel never falls off the screen when expanded or moved
@@ -776,7 +792,13 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
                         type: "button",
                         "data-dsh-skin-fold": "",
                         title: "展开设置",
-                        onClick: cycleStage,
+                        onClick: () => {
+                            if (dragged.current) {
+                                dragged.current = false;
+                                return;
+                            }
+                            cycleStage();
+                        },
                         onPointerDown: (event) => { onPointerDown(event, true); },
                         onPointerMove,
                         onPointerUp,

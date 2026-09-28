@@ -354,6 +354,38 @@ equal(panel.props["data-dsh-skin-mini"], undefined, "stage 0 must not be the min
 equal(panel.props["data-dsh-skin-folded"], undefined, "stage 0 must not be folded either");
 equal(JSON.parse(storage.get("dsh.skin.win2000.ui")).stage, 0, "the cycle must return to stage 0");
 assert(panel.children.length > 2, "stage 0 must show the rows again");
+// The mini plus is both the drag handle and the cycle button, so a drag ends with
+// a click. That click must not change the stage, or dragging reopens the panel.
+const fakePointer = (x, y) => ({
+    clientX: x,
+    clientY: y,
+    pointerId: 1,
+    target: { closest: () => null },
+    currentTarget: {
+        parentElement: { getBoundingClientRect: () => ({ left: 12, top: 34 }) },
+        setPointerCapture: () => {},
+        releasePointerCapture: () => {},
+    },
+});
+foldButton.props.onClick();
+panel = render("settings", plugin.SkinSettings);
+find(panel, (child) => child.props?.["data-dsh-skin-fold"] !== undefined).props.onClick();
+panel = render("settings", plugin.SkinSettings);
+let mini = find(panel, (child) => child.props?.["data-dsh-skin-fold"] !== undefined);
+mini.props.onPointerDown(fakePointer(200, 200), true);
+mini.props.onPointerMove(fakePointer(260, 240));
+mini.props.onPointerUp(fakePointer(260, 240));
+mini.props.onClick();
+panel = render("settings", plugin.SkinSettings);
+equal(panel.props["data-dsh-skin-mini"], "", "a click that ends a drag must not cycle the stage");
+equal(JSON.parse(storage.get("dsh.skin.win2000.ui")).stage, 2, "the stage must still be 2 after a drag");
+// A click without movement still cycles.
+mini = find(panel, (child) => child.props?.["data-dsh-skin-fold"] !== undefined);
+mini.props.onPointerDown(fakePointer(200, 200), true);
+mini.props.onPointerUp(fakePointer(200, 200));
+mini.props.onClick();
+panel = render("settings", plugin.SkinSettings);
+equal(panel.props["data-dsh-skin-mini"], undefined, "a click without movement must still expand the panel");
 
 for (const cleanup of effects) cleanup();
 equal(body.getAttribute("data-dsh-skin"), null, "dispose must strip the skin attribute");
