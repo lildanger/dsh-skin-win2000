@@ -177,6 +177,10 @@ assert(css.includes("font-synthesis:none !important"), "synthetic bold must stay
 assert(css.includes("text-rendering:optimizeSpeed"), "the pixel face must snap glyphs to whole pixels: optimizeSpeed does, geometricPrecision explicitly does not");
 assert(!css.includes("geometricPrecision"), "geometricPrecision defeats the pixel grid and fringes every 1px stem");
 assert(css.includes(":is(strong,b){text-shadow:1px 0 0 currentColor"), "emphasis must be overprinted one pixel, not synthetically emboldened");
+// The sidebar width handle is invisible until hovered in the stock styles; the
+// skin keeps its bevel on so the draggable edge can be found.
+assert(/\[data-width-handle\]:after\{[^}]*opacity:1 !important/.test(css), "the width handle must stay visible, not appear only on hover");
+assert(/\[data-width-handle\]:after\{[^}]*box-shadow:inset 1px 1px 0 #F5F5F5/.test(css), "the width handle must carry the classic raised bevel");
 // The selected sidebar row paints its icons black; a light tint was tried and
 // rejected twice, so this pins the requested colour.
 assert(css.includes('_selected"]) svg{color:#000000 !important}'), "the selected row\u0027s icons must be black");
