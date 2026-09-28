@@ -150,17 +150,17 @@ node verify-metrics.mjs  # 对照 Windows Server 2003 度量表，纯白必须�
 ## 开发
 
 ```
-dsh-skin-win2000/
-├── client.js             全部实现（单文件，零构建）
-├── index.js              宿主半占位（export function apply() {}）
-├── package.json          插件清单：exports / dsh.bundle / dsh.client
-├── cordis.patch.yml      bundle 层补丁
-├── check.mjs             最小可运行检查
-├── verify-metrics.mjs    度量表配色回归
-├── tools/
-│   └── capture.mjs      通过 CDP 抓取运行中界面的真实截图
-├── docs/screenshots/     README 用的三张实拍 PNG
-└── HANDOFF.md            交接文档：结构、行号、踩坑记录
+dsh-skin-win2000/            ← 仓库根就是包本体
+├── client.js                全部实现（单文件，零构建）
+├── index.js                 宿主半占位（export function apply() {}）
+├── package.json             插件清单：exports / dsh.bundle / dsh.client
+├── cordis.patch.yml         bundle 层补丁
+├── check.mjs                最小可运行检查
+├── verify-metrics.mjs       度量表配色回归
+├── tools/capture.mjs        通过 CDP 抓取运行中界面的真实截图
+├── docs/screenshots/        README 用的三张实拍 PNG
+├── HANDOFF.md               交接文档：结构、行号、踩坑记录
+└── workspace/               本地脚本与锁文件（不随包发布）
 ```
 
 `HANDOFF.md` 里记着 9 条踩坑（`:where()` 特异性归零、模板字面量被反引号提前闭合、bundle 强缓存、面板样式挂在皮肤属性下导致关皮肤时自己塌掉、`background-color !important` 压过主按钮简写……），改代码前值得先看一眼。

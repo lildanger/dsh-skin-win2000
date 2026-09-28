@@ -150,17 +150,17 @@ node verify-metrics.mjs  # the Windows Server 2003 metric table; pure white must
 ## Development
 
 ```
-dsh-skin-win2000/
-├── client.js             the whole implementation (one file, no build)
-├── index.js              host half placeholder (export function apply() {})
-├── package.json          manifest: exports / dsh.bundle / dsh.client
-├── cordis.patch.yml      bundle-layer patch
-├── check.mjs             minimal runnable check
-├── verify-metrics.mjs    colour regression against the metric table
-├── tools/
-│   └── capture.mjs       captures the README images over CDP
-├── docs/screenshots/     the three captured PNGs used above
-└── HANDOFF.md            handoff notes: structure, line numbers, pitfalls
+dsh-skin-win2000/            ← the repository root IS the package
+├── client.js                the whole implementation (one file, no build)
+├── index.js                 host half placeholder (export function apply() {})
+├── package.json             manifest: exports / dsh.bundle / dsh.client
+├── cordis.patch.yml         bundle-layer patch
+├── check.mjs                minimal runnable check
+├── verify-metrics.mjs       colour regression against the metric table
+├── tools/capture.mjs        captures the README images over CDP
+├── docs/screenshots/        the three captured PNGs
+├── HANDOFF.md               handoff notes: structure, line numbers, pitfalls
+└── workspace/               local scripts and lockfiles (not published)
 ```
 
 `HANDOFF.md` records nine pitfalls hit while building this (a `:where()` selector flattening specificity to zero, a backtick inside a CSS comment closing a template literal early, the immutable bundle cache, the panel collapsing when the skin attribute is removed, `background-color !important` outranking a primary button's `background` shorthand, and more). Worth reading before changing anything.

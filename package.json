@@ -1,7 +1,68 @@
 {
-	"type": "module",
-	"dependencies": {
-		"@typesafe-ai/sdk": "^0.6.0",
-		"dsh-win-terminal-inspector": "git+https://github.com/clearkurt/dsh-win-terminal-inspector.git"
-	}
+  "name": "dsh-skin-win2000",
+  "version": "1.0.0",
+  "description": "Windows Server 2003 skin for the DSH Web GUI: metric-accurate grey chrome, two-tone gradient title bars, 1px bevels, square corners and a 16px scrollbar. 给 DSH Web GUI 换上 Windows Server 2003 经典外观。",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek",
+    "deepseek-harness",
+    "harness",
+    "skin",
+    "theme",
+    "windows",
+    "windows-server-2003",
+    "win2000",
+    "luna",
+    "retro",
+    "classic",
+    "web-gui",
+    "ui",
+    "css"
+  ],
+  "meta": {
+    "title": "Windows Server 2003 Skin",
+    "description": "把 DSH Web GUI 换成 Windows Server 2003 经典界面：经典中性灰控件、双色渐变标题栏、1px 立体浮雕、绝对直角、16px 经典滚动条。"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lildanger/dsh-skin-win2000.git"
+  },
+  "homepage": "https://github.com/lildanger/dsh-skin-win2000#readme",
+  "bugs": {
+    "url": "https://github.com/lildanger/dsh-skin-win2000/issues"
+  },
+  "files": [
+    "client.js",
+    "index.js",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh.md",
+    "LICENSE",
+    "docs",
+    "tools"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }

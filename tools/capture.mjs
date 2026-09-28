@@ -6,7 +6,7 @@ import { spawn } from "node:child_process";
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 
-const require = createRequire("file:///D:/Desktop/fuck/DSH/dsh-skin-win2000/");
+const require = createRequire("file:///D:/Desktop/fuck/DSH/");
 const WebSocket = require("C:/Users/dange/.dsh/profiles/node_modules/ws");
 
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
