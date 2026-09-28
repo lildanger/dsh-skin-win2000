@@ -58,7 +58,7 @@
 **方式一：Git 仓库（无需 npm 账号）**
 
 ```bash
-dsh plugin --profile web add github:<你的账号>/dsh-skin-win2000
+dsh plugin --profile web add github:lildanger/dsh-skin-win2000
 ```
 
 仓库需要是公开的，且**仓库根就是包本体**（根目录下能读到 `package.json` 里的 `dsh.bundle.patch`）。

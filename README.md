@@ -58,7 +58,7 @@ The skin is a standard DSH bundle: the package declares `dsh.bundle.patch` point
 **Route 1 — Git repository (no npm account needed)**
 
 ```bash
-dsh plugin --profile web add github:<your-account>/dsh-skin-win2000
+dsh plugin --profile web add github:lildanger/dsh-skin-win2000
 ```
 
 The repository must be public, and **the repository root must be the package** (its `package.json` has to carry `dsh.bundle.patch`).
