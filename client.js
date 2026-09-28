@@ -76,7 +76,7 @@ window.__ModuleLoader__.load({
             "--dsw-alias-label-dimmed": "#808080",
             "--dsw-alias-label-caption": "#555555",
             "--dsw-alias-menu-icon": "#000000",
-            "--dsw-alias-link": "#003C74",
+            "--dsw-alias-link": "#0000FF",
 
             /* buttons — flat grey under the bevels drawn by the stylesheet */
             "--dsw-alias-button-primary-fill": "#003C74",
@@ -216,7 +216,7 @@ window.__ModuleLoader__.load({
             "--shiki-token-parameter": "#5A5855",
             "--shiki-token-function": "#003C74",
             "--shiki-token-punctuation": "#333333",
-            "--shiki-token-link": "#0A246A",
+            "--shiki-token-link": "#0000FF",
             /* the one gradient the theme paints behind reasoning text */
             "--dsw-linear-gradient-think": "linear-gradient(180deg,#D4D0C8 20.19%,#D4D0C800 100%)",
             "--dsw-linear-think-select": "linear-gradient(180deg,#C8C4BC 20.19%,#C8C4BC00 100%)",
