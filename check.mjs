@@ -177,6 +177,9 @@ assert(css.includes("font-synthesis:none !important"), "synthetic bold must stay
 assert(css.includes("text-rendering:optimizeSpeed"), "the pixel face must snap glyphs to whole pixels: optimizeSpeed does, geometricPrecision explicitly does not");
 assert(!css.includes("geometricPrecision"), "geometricPrecision defeats the pixel grid and fringes every 1px stem");
 assert(css.includes(":is(strong,b){text-shadow:1px 0 0 currentColor"), "emphasis must be overprinted one pixel, not synthetically emboldened");
+// The left sidebar's edge was a 0.5px hairline with an unstyled 8px drag strip.
+assert(/\[class\*="_sidebarCol"\]\{border-right:0 !important;box-shadow:inset -1px 0 0 #808080/.test(css), "the sidebar edge must carry the classic groove, not a hairline");
+assert(/\[class\$="_handle"\]:hover\{background:#D4D0C8 !important/.test(css), "the sidebar width handle must show itself on hover");
 // The selected sidebar row paints its icons black; a light tint was tried and
 // rejected twice, so this pins the requested colour.
 assert(css.includes('_selected"]) svg{color:#000000 !important}'), "the selected row\u0027s icons must be black");
