@@ -2,86 +2,86 @@
 
 # dsh-skin-win2000
 
-**Windows Server 2003 for the DeepSeek Harness Web GUI.**
+**给 DeepSeek Harness Web GUI 换上一身 Windows Server 2003 的皮。**
 
-Classic grey controls, two-tone gradient title bars, 1px bevels, hard square corners, a 16px scrollbar.
+经典中性灰控件、双色渐变标题栏、1px 立体浮雕、绝对直角、16px 经典滚动条。
 
-[![DSH plugin](https://img.shields.io/badge/DSH-client--plugin-0A246A?style=flat-square)](#install)
-[![platform](https://img.shields.io/badge/platform-web%20GUI-316AC5?style=flat-square)](#install)
-[![no build](https://img.shields.io/badge/build-none-D4D0C8?style=flat-square)](#development)
-[![license](https://img.shields.io/badge/license-MIT-808080?style=flat-square)](#license)
+[![DSH plugin](https://img.shields.io/badge/DSH-client--plugin-0A246A?style=flat-square)](#安装)
+[![platform](https://img.shields.io/badge/platform-web%20GUI-316AC5?style=flat-square)](#安装)
+[![no build](https://img.shields.io/badge/build-none-D4D0C8?style=flat-square)](#开发)
+[![license](https://img.shields.io/badge/license-MIT-808080?style=flat-square)](#许可)
 
-**English** · [简体中文](README.zh.md)
+**简体中文** · [English](README.en.md)
 
 </div>
 
 ---
 
-## Screenshots
+## 界面预览
 
-### The interface — grey chrome, navy selection, corner panel
+### 整体界面 —— 灰底、深蓝选中、右下角皮肤面板
 
-![Main window](docs/screenshots/01-main-window.png)
+![主界面](docs/screenshots/01-main-window.png)
 
-### The classic window — gradient title bar, menu bar, sunken fields and status bar
+### 经典窗口 —— 渐变标题栏、菜单栏、凹陷输入框与状态栏
 
-![Classic window](docs/screenshots/02-classic-window.png)
+![经典窗口](docs/screenshots/02-classic-window.png)
 
-### The settings surface — form controls, switches and lists
+### 设置界面 —— 表单控件、开关与列表上的皮肤
 
-![Settings](docs/screenshots/03-settings.png)
+![设置界面](docs/screenshots/03-settings.png)
 
 ---
 
-## What this is
+## 这是什么
 
-A **client plugin** for DSH (DeepSeek Harness) that repaints the Web GUI in the visual language of Windows Server 2003. Install it and it applies itself; a draggable, collapsible panel appears in the bottom-right corner, and one click turns the skin off, restoring DSH exactly as it was.
+一个 DSH（DeepSeek Harness）的**客户端插件**，把 Web GUI 的画布整体换成 Windows Server 2003 的视觉语言。装上即生效，右下角会出现一个可拖动、可折叠的控制面板；点一下就能关掉皮肤，界面立刻恢复 DSH 原样。
 
-It does not approximate the era — it takes its values from the era's metric table. Control surfaces, both ends of the active title-bar gradient, the inactive gradient, the three shading greys, the selection highlight: every one of them corresponds to a row in the Windows System Metrics table, and `verify-metrics.mjs` in this repository compares the shipped values against that table and fails when they drift.
+它不做"大概像那个年代"，而是**按度量表逐项取值**：控件表面、标题栏两端的渐变色、失焦渐变色、三级投影灰、选中高亮——每一项都能在那个年代的 System Metrics 表里找到对应行。仓库里的 `verify-metrics.mjs` 会拿代码里的实际取值去比对这张表，对不上就报错。
 
-## Features
+## 特性
 
-- **Metric-accurate palette** — control surface `#D4D0C8`, active title bar `#0A246A → #A6CAF0`, inactive `#808080 → #C0C0C0`, three shading steps `#F5F5F5 / #808080 / #404040`, selection `#0A246A`
-- **Hard square corners** — every `border-radius` is zeroed, and the six `--dsw-radius-*` tokens are pinned to `0px`. All 394 radius declarations across the DSH client packages read those tokens, so this cuts the rounding at the source instead of chasing selectors
-- **1px bevels** — every raised and sunken edge is a stepped `inset box-shadow`: raised buttons, sunken fields and code blocks, and a pressed state that inverts the bevel and shifts content by 1px
-- **No pure white** — the metric table's `#FFFFFF` ButtonHighlight becomes `#F5F5F5`, the white Window surface becomes `#D4D0C8`. The skin contains no pure-white pixel
-- **16px square scrollbar** — grey trough with a stippled track, raised thumb, sunken while dragging
-- **Stop is red** — Send and Stop share one button class, so the skin keys on `aria-label`; pausing turns the control a solid `#CC0000`
-- **The settings panel** — bottom-right, dragged by its title bar (position remembered), collapsible, with the skin switch, the palette choice and a classic window specimen
-- **Your typeface is left alone** — the skin sets no `font-family` anywhere except the Marlett symbol glyphs in the window title buttons. Font and size stay entirely under your DSH font settings
-- **No build step** — plain JavaScript, one file, refresh to apply
+- **度量表级配色** —— 控件表面 `#D4D0C8`、活动标题栏 `#0A246A → #A6CAF0`、失焦标题栏 `#808080 → #C0C0C0`、投影三级 `#F5F5F5 / #808080 / #404040`、选中高亮 `#0A246A`
+- **绝对直角** —— 全表 `border-radius` 归零，并把 6 个 `--dsw-radius-*` token 直接压成 `0px`。DSH 各组件里 394 处圆角都读这几个 token，所以这是从源头掐断，不靠逐个追选择器
+- **1px 立体浮雕** —— 所有凸起/凹陷都是阶梯式 `inset box-shadow`：按钮凸起、输入框与代码块凹陷、按下换成凹陷并位移 1px
+- **无纯白** —— 度量表里的 `#FFFFFF`（ButtonHighlight）换成 `#F5F5F5`，工作区白底换成 `#D4D0C8`。整个皮肤不含任何纯白像素
+- **16px 直角滚动条** —— 灰槽 + 白点阵纹 + 凸起滑块，滑块按下变凹陷
+- **停止生成是红的** —— 发送与停止共用同一个按钮类，皮肤按 `aria-label` 精确区分，暂停时是大红底 `#CC0000`
+- **皮肤面板** —— 右下角，标题栏可拖动（位置记忆）、可折叠、开关皮肤、切换配色、弹出经典窗口示例
+- **不动你的字体** —— 皮肤自身没有任何 `font-family` 覆盖（唯一例外是窗口标题按钮的 Marlett 符号字形），字号、字体完全由你的 DSH 字体设置决定
+- **零构建** —— 纯 JavaScript，单文件实现，改完刷新即生效
 
-## Install
+## 安装
 
-The skin is a standard DSH bundle: the package declares `dsh.bundle.patch` pointing at `cordis.patch.yml`, and `dsh.client` for its browser half. The plugin manager accepts a package name, a Git address, an archive or a local path, so any of the three routes below works.
+皮肤是一个标准的 DSH 组合包（bundle）：包里有 `dsh.bundle.patch` 指向 `cordis.patch.yml`，有 `dsh.client` 声明浏览器半侧。DSH 的插件管理器接受**包名、Git 地址、压缩包或本地路径**四种来源，所以下面三种装法任选。
 
-**Route 1 — Git repository (no npm account needed)**
+**方式一：Git 仓库（无需 npm 账号）**
 
 ```bash
 dsh plugin --profile web add github:lildanger/dsh-skin-win2000
 ```
 
-The repository must be public, and **the repository root must be the package** (its `package.json` has to carry `dsh.bundle.patch`).
+仓库需要是公开的，且**仓库根就是包本体**（根目录下能读到 `package.json` 里的 `dsh.bundle.patch`）。
 
-**Route 2 — npm package (indexable by the market)**
+**方式二：npm 包（市场可索引）**
 
 ```bash
-# publisher
+# 发布方
 npm publish
 
-# user
+# 使用方
 dsh plugin --profile web add dsh-skin-win2000
 ```
 
-**Route 3 — local path (for development)**
+**方式三：本地路径（开发用）**
 
 ```bash
 dsh plugin --profile web add link:/path/to/dsh-skin-win2000
 ```
 
-### One more step after installing
+### 装完还要做一步
 
-When the package is not picked up automatically as a bundle layer (a `link:` install, or a manual copy), insert one row into your profile's `cordis.patch.yml`:
+如果包**不是**作为 bundle 层被自动加载（例如用了 `link:` 或手动拷贝），需要在你 profile 的 `cordis.patch.yml` 里插入一行：
 
 ```yaml
 - insert:
@@ -89,88 +89,91 @@ When the package is not picked up automatically as a bundle layer (a `link:` ins
       name: dsh-skin-win2000
 ```
 
-In the GUI you can also use **Sidebar → Plugins → Add plugin**, paste the package name or Git address, and press **Enable now** when it finishes.
+图形界面里也可以走「侧栏 → 插件 → 添加插件」，把上面的包名或 Git 地址填进去，装完点**立即启用**。
 
-Reload the page. **If nothing changes, force a reload with `Ctrl+Shift+R`** — client bundles are served with a one-year immutable cache, so an ordinary reload keeps the old JavaScript.
+刷新页面即可。**如果界面没变化，请 `Ctrl+Shift+R` 强制刷新** —— 客户端 bundle 带一年强缓存，普通刷新拿不到新版本。
 
-### About fonts
+### 关于字体
 
-The skin **ships the bitmap face it renders with**: `fonts/unsciiCJKV18.otf` (6.37 MB) travels inside the package, served by the host half at `/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf`.
+皮肤**自带**它渲染文字用的点阵字体：`fonts/unsciiCJKV18.otf`（6.37 MB）随包分发，由宿主半侧在 `/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf` 提供。
 
-- The `@font-face` declares **no `local()` source**, so a copy installed on the machine can never take precedence — every installation renders identically
-- Only that one family is declared, and the stack is `"unsciiCJKV18", monospace`; no family this package does not carry is named
-- The response carries `cache-control: public, max-age=604800, immutable`, so a browser fetches it at most once a week, and `font-display: swap` keeps text visible until it lands
-- Licence status is in [fonts/README.md](fonts/README.md): the face's redistribution terms are **documented nowhere**, and upstream `viznut/unscii` declares no licence either. That file also says how to replace or remove it
+- `@font-face` **不写 `local()`**，所以机器上装了什么字体都不会抢先——每台机器渲染结果一致
+- 只声明这一个字体族，字体栈为 `"unsciiCJKV18", monospace`，不再引用包里没有的字体
+- 响应带 `cache-control: public, max-age=604800, immutable`，浏览器每周最多下载一次；`font-display: swap` 保证字体到达前文字可见
+- 字体许可状态见 [fonts/README.md](fonts/README.md)：该字体的再分发条款**没有任何地方写明**，上游 `viznut/unscii` 也未声明许可证。如需替换或移除，该文件里写了做法
 
-The rest of the skin **sets no font** (the only exception is the Marlett symbol glyphs in the window title buttons). Switch the panel's pixel-font toggle off and the interface uses your own font settings entirely.
+皮肤其余部分**不设置字体**：唯一例外是窗口标题按钮的 Marlett 符号字形。如果你关掉面板里的「点阵字体」开关，界面就完全用你自己的字体设置。
 
-## Using it
+## 使用
 
-The panel in the bottom-right corner:
+右下角面板：
 
-| Control | What it does |
+| 控件 | 作用 |
 |---|---|
-| Title bar | Drag the whole panel anywhere; the position is remembered in localStorage |
-| `–` / `+` | Collapse the panel to its title bar, or expand it |
-| 启用皮肤 (Enable skin) | Toggles the skin. Switching it off restores DSH exactly as it was, while the panel keeps its 2003 chrome so you can switch back |
-| Windows 2003 | Switches to the Luna palette |
-| 窗口示例 (Window specimen) | Opens a fully reproduced classic dialog: title bar with the three title buttons, menu bar, sunken client area, three-panel status bar and an action row. Click `×` to see the inactive gradient |
+| 标题栏 | 按住即可拖动整个面板，位置记在 localStorage；**双击**回到右下角 |
+| 右上角按钮 | **三档循环**：完整面板 → 只剩标题栏 → 一个小 ＋ → 回到完整面板 |
+| 启用皮肤 | 开关皮肤。关掉后界面恢复 DSH 原样，面板本身仍保持 2003 外观，方便随时开回来 |
+| 点阵字体 | 开关随包分发的点阵字体；关掉就用你自己的字体设置 |
+| 窗口示例 | 弹出一个完整复刻的经典对话框：标题栏 + 三个标题按钮 + 菜单栏 + 凹陷客户区 + 三段状态栏 + 操作按钮行，点标题栏的 `×` 可看失焦渐变 |
 
-## Palette
+最小档那个小 ＋ 本身也能拖动 —— 它是收起来之后唯一还能抓的地方。拖它不会误触发展开。
 
-| Interface element | Value | Token |
+## 配色表
+
+| 界面元素 | 取值 | 落地 token |
 |---|---|---|
-| 3D control surface / taskbar / menu bar | `#D4D0C8` | `--dsw-alias-bg-base` |
-| Active title bar, start → end | `#0A246A` → `#A6CAF0` | `--dsh-skin-titlebar-active` |
-| Inactive title bar, start → end | `#808080` → `#C0C0C0` | `--dsh-skin-titlebar-inactive` |
-| 3D highlight | `#F5F5F5` | `--dsh-skin-shadow-raised` |
-| 3D shadow | `#808080` | same |
-| Deepest shadow | `#404040` | `--dsw-alias-border-l4` |
-| Selection highlight | `#0A246A` | `--dsw-specific-sidebar-nav-item-active` |
-| Primary button | `#003C74`, hover `#316AC5` | `--dsw-alias-button-primary-fill` |
-| Stop generating | `#CC0000` | matched by `aria-label` |
-| Code block | `#C8C4BC` / banner `#BFBBB2` | `--dsw-alias-markdown-code-block` |
-| Tooltip bubble | `#FFFFE1` on `#000000` text | `--dsw-alias-tooltip-bg` |
+| 3D 控件表面 / 任务栏 / 菜单栏 | `#D4D0C8` | `--dsw-alias-bg-base` |
+| 活动标题栏 起点 → 终点 | `#0A246A` → `#A6CAF0` | `--dsh-skin-titlebar-active` |
+| 失焦标题栏 起点 → 终点 | `#808080` → `#C0C0C0` | `--dsh-skin-titlebar-inactive` |
+| 3D 高光 | `#F5F5F5` | `--dsh-skin-shadow-raised` |
+| 3D 投影 | `#808080` | 同上 |
+| 最深投影 | `#404040` | `--dsw-alias-border-l4` |
+| 选中高亮 | `#0A246A` | `--dsw-specific-sidebar-nav-item-active` |
+| 主按钮 | `#003C74`，悬停 `#316AC5` | `--dsw-alias-button-primary-fill` |
+| 停止生成 | `#CC0000` | `aria-label` 命中 |
+| 代码块 | `#C8C4BC` / 标题条 `#BFBBB2` | `--dsw-alias-markdown-code-block` |
+| 提示气泡 | 底 `#FFFFE1` 字 `#000000` | `--dsw-alias-tooltip-bg` |
 
-## Verification
+## 验证
 
-Two runnable checks ship with the repository. Neither needs a browser:
+仓库自带两个可执行检查，不需要浏览器：
 
 ```bash
-node check.mjs           # spec values, stylesheet, panel and window interactions, dispose
-node verify-metrics.mjs  # the Windows Server 2003 metric table; pure white must be 0
+node check.mjs           # 规范值、样式表、面板与窗口交互、dispose 清理
+node verify-metrics.mjs  # 对照 Windows Server 2003 度量表，纯白必须为 0
 ```
 
-`check.mjs` drives the plugin through stubs (module loader, React, DOM) and covers: every `SPEC` constant, the three bevel states, both title-bar gradients, the 11px type size, the absence of any font takeover, the zeroed radii, square scrollbars, the panel and window rules, the bubble colour, the projection attributes, panel folding and the skin switch, the specimen window's title bar / menu / status bar / action row, and the cleanup path.
+`check.mjs` 用桩件（module loader / React / DOM）把插件跑一遍，覆盖：SPEC 常量逐值、三态立体阴影、标题栏双向渐变、11px 字号、无字体接管、radius 全归零、滚动条直角、面板与窗口规则、气泡配色、投影三属性、面板折叠与开关、窗口示例的标题栏/菜单/状态栏/操作按钮，以及卸载后的清理。
 
-## Known limitations
+## 已知限制
 
-- **Some rules depend on hashed class names** — a few rules match CSS-module names by prefix (`[class*="bubble"]`, `[class*="_card"]`). If a DSH upgrade renames them, those rules fail silently and the bubble or card colours fall back to the defaults.
-- **The `--dsw-static-*` ramp is rewritten** — it is not DSH's original. A component that uses the brightest static step as *text* colour (the tooltip bubble does exactly that) can end up light-on-light; the skin names the bubble's text colour explicitly for that reason.
-- **11px is global** — it is part of the metric table, so body text and code blocks drop to 11px along with the controls.
-- **`-webkit-font-smoothing: none` does nothing on Windows Chromium** (it renders through DirectWrite). It is declared, but it cannot change the rendering there.
-- **Square corners are indiscriminate** — avatars, status dots and switch knobs all become squares. To keep circles, exclude them from the `border-radius:0 !important` selector.
-- **The screenshots are captures** — the three PNGs are taken from a running interface by `tools/capture.mjs` over the Chrome DevTools Protocol, with the skin mounted (`data-dsh-skin="win2000"`). The capture machine uses this author's bitmap-font and palette settings, so type rendering follows those settings.
+- **依赖部分类名** —— 少数规则用 `[class*="bubble"]`、`[class*="_card"]` 这类前缀匹配组件库的 CSS-module 类名。DSH 升级后若命名变化，这些规则会静默失效（症状：气泡或卡片配色回到默认）。
+- **`--dsw-static-*` 静态色阶被重写过** —— 不是 DSH 原值。若有组件把"静态最亮档"当文字色用（提示气泡就是例证），可能得到浅底浅字；皮肤已为气泡单独指定文字色。
+- **11px 是全局字号** —— 这是度量表的一部分，正文与代码块一起降到 11px。
+- **`-webkit-font-smoothing: none` 在 Windows 的 Chromium 上不生效**，写了但改变不了渲染。
+- **直角是通杀的** —— 头像、状态圆点、开关滑块都会变方。需要保留圆形的话，从 `border-radius:0 !important` 的选择器里排除即可。
+- **截图是实拍** —— 仓库里的三张 PNG 由 `tools/capture.mjs` 通过 Chrome DevTools Protocol 抓取运行中的界面，皮肤状态为 `data-dsh-skin="win2000"`。抓图环境使用你本机的点阵字体与配色设置，所以字体观感会与你的设置一致。
 
-## Development
+## 开发
 
 ```
-dsh-skin-win2000/            ← the repository root IS the package
-├── client.js                the whole implementation (one file, no build)
-├── index.js                 host half placeholder (export function apply() {})
-├── package.json             manifest: exports / dsh.bundle / dsh.client
-├── cordis.patch.yml         bundle-layer patch
-├── check.mjs                minimal runnable check
-├── verify-metrics.mjs       colour regression against the metric table
-├── tools/capture.mjs        captures the README images over CDP
-├── fonts/unsciiCJKV18.otf     the bundled bitmap face (6.37 MB)
-├── docs/screenshots/        the three captured PNGs
-├── HANDOFF.md               handoff notes: structure, line numbers, pitfalls
-└── workspace/               local scripts and lockfiles (not published)
+dsh-skin-win2000/            ← 仓库根就是包本体
+├── client.js                全部实现（单文件，零构建）
+├── index.js                 宿主半占位（export function apply() {}）
+├── package.json             插件清单：exports / dsh.bundle / dsh.client
+├── cordis.patch.yml         bundle 层补丁
+├── check.mjs                最小可运行检查
+├── verify-metrics.mjs       度量表配色回归
+├── tools/capture.mjs        通过 CDP 抓取运行中界面的真实截图
+├── fonts/unsciiCJKV18.otf     随包分发的点阵字体（6.37 MB）
+├── docs/screenshots/        README 用的三张实拍 PNG
+├── HANDOFF.md               交接文档：结构、行号、踩坑记录
+├── README.en.md             英文版说明
+└── workspace/               本地脚本与锁文件（不随包发布）
 ```
 
-`HANDOFF.md` records nine pitfalls hit while building this (a `:where()` selector flattening specificity to zero, a backtick inside a CSS comment closing a template literal early, the immutable bundle cache, the panel collapsing when the skin attribute is removed, `background-color !important` outranking a primary button's `background` shorthand, and more). Worth reading before changing anything.
+`HANDOFF.md` 里记着 9 条踩坑（`:where()` 特异性归零、模板字面量被反引号提前闭合、bundle 强缓存、面板样式挂在皮肤属性下导致关皮肤时自己塌掉、`background-color !important` 压过主按钮简写……），改代码前值得先看一眼。
 
-## License
+## 许可
 
 MIT

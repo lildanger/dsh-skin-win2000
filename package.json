@@ -56,7 +56,7 @@
     "docs",
     "tools",
     "README.md",
-    "README.zh.md",
+    "README.en.md",
     "LICENSE"
   ],
   "engines": {
