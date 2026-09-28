@@ -174,6 +174,23 @@ assert(css.includes("font-synthesis:none !important"), "synthetic bold must stay
 assert(css.includes("text-rendering:optimizeSpeed"), "the pixel face must snap glyphs to whole pixels: optimizeSpeed does, geometricPrecision explicitly does not");
 assert(!css.includes("geometricPrecision"), "geometricPrecision defeats the pixel grid and fringes every 1px stem");
 assert(css.includes(":is(strong,b){text-shadow:1px 0 0 currentColor"), "emphasis must be overprinted one pixel, not synthetically emboldened");
+// The turn navigator's quick-jump marks are buttons, so the blanket bevel would
+// frame each one. The exclusion must target them specifically and outrank the
+// bevel rules, otherwise every mark keeps a frame.
+const markRule = css.match(/body\[data-dsh-skin="win2000"\] nav\[aria-label\] button\[data-index\][^{]*\{[^}]*\}/);
+assert(markRule !== null, "the turn navigator marks must be excluded from the bevel");
+assert(markRule[0].includes("box-shadow:none !important"), "the marks must carry no bevel at all");
+const specificity = (selector) => {
+    const ids = (selector.match(/#[\w-]+/g) ?? []).length;
+    const rest = selector.replace(/#[\w-]+/g, "");
+    const classes = (rest.match(/\.[\w-]+|\[[^\]]+\]|:(?!:)[\w-]+/g) ?? []).length;
+    const types = (rest.replace(/\.[\w-]+|\[[^\]]+\]|::?[\w-]+(\([^)]*\))?/g, " ").match(/[a-zA-Z][\w-]*/g) ?? []).length;
+    return ids * 10000 + classes * 100 + types;
+};
+const markSelector = markRule[0].slice(0, markRule[0].indexOf("{"));
+const bevelSelector = 'body[data-dsh-skin="win2000"] :is(button,summary):active';
+assert(specificity(markSelector) > specificity(bevelSelector), `the mark exclusion (${specificity(markSelector)}) must outrank the pressed bevel (${specificity(bevelSelector)})`);
+assert(css.includes("nav[aria-label] button[data-index]:hover"), "hover must be excluded too, or the frame returns under the cursor");
 // Borrowing a system bold face was tried and reverted: Consolas advances 8.8px
 // against the pixel grid's 8px, so every Latin column drifted ~10% and the
 // layout came apart. Any bold face used here must share the grid's metrics.

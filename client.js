@@ -382,6 +382,14 @@ body[data-dsh-skin="win2000"] :is([role="dialog"],[role="alertdialog"]){box-shad
 body[data-dsh-skin="win2000"] :is(pre,table,fieldset){box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF}
 body[data-dsh-skin="win2000"] :is(input,textarea,select,button,summary,pre,code,blockquote,table,th,td,fieldset,legend,[role="button"],[role="tab"],[role="dialog"],[role="menu"],[role="listbox"],[role="textbox"],[contenteditable="true"],[data-dsh-skin-panel],[data-dsh-skin-panel] *,[data-dsh-skin-window],[data-dsh-skin-window] *,[class*="Badge"],[class*="badge"]){border-radius:0 !important}
 body[data-dsh-skin="win2000"] :is([role="button"],[role="tab"],[role="option"],[role="menuitem"]):not([aria-pressed="true"]):not([aria-selected="true"]):not([class*="_selected"]){background:#D4D0C8 !important}
+/* The turn navigator's quick-jump marks are buttons, so the raised bevel would
+   frame every one of them; the navigator draws borderless marks of its own. The
+   hook is nav[aria-label] button[data-index], which outranks the bevel rules
+   without naming a hashed module class. */
+body[data-dsh-skin="win2000"] nav[aria-label] button[data-index],
+body[data-dsh-skin="win2000"] nav[aria-label] button[data-index]:hover,
+body[data-dsh-skin="win2000"] nav[aria-label] button[data-index]:active,
+body[data-dsh-skin="win2000"] nav[aria-label] button[data-index]:focus-visible{box-shadow:none !important;background:transparent !important;outline:none !important}
 body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]){background-color:#0A246A !important;color:#EDEDED !important}
 body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) :is(span,div,p,a,time){color:#EDEDED !important}
 body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) svg{color:#EDEDED !important}
