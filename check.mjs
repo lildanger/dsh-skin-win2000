@@ -316,23 +316,41 @@ equal(attributes.get("color-scheme"), "", "switching off must release the color 
 row(render("settings", plugin.SkinSettings), "启用皮肤").props.onClick();
 equal(body.getAttribute("data-dsh-skin"), "win2000", "switching back on must dress the document again");
 
-// Panel chrome: a draggable title bar and a fold switch that survives a re-render.
+// Panel chrome: a draggable title bar and a three-stage switch that survives a
+// re-render: 0 full panel, 1 title bar only, 2 a single small plus.
 panel = render("settings", plugin.SkinSettings);
 const panelBar = find(panel, (child) => child.props?.["data-dsh-skin-panelbar"] !== undefined);
 assert(panelBar !== null, "the panel needs a title bar to drag");
 assert(typeof panelBar.props.onPointerDown === "function" && typeof panelBar.props.onPointerMove === "function", "the title bar must carry the drag handlers");
 const foldButton = panelBar.children.find((child) => child.props?.["data-dsh-skin-fold"] !== undefined);
-assert(foldButton !== undefined, "the title bar needs a fold switch");
+assert(foldButton !== undefined, "the title bar needs a stage switch");
+
+// 0 -> 1: title bar only, and the stage is remembered.
 foldButton.props.onClick();
 panel = render("settings", plugin.SkinSettings);
-equal(panel.props["data-dsh-skin-folded"], "", "folding must collapse the panel to its title bar");
-assert(JSON.parse(storage.get("dsh.skin.win2000.ui")).folded === true, "the folded state must be remembered");
+equal(panel.props["data-dsh-skin-folded"], "", "stage 1 must collapse the panel to its title bar");
+equal(panel.props["data-dsh-skin-mini"], undefined, "stage 1 is not the mini stage");
+equal(JSON.parse(storage.get("dsh.skin.win2000.ui")).stage, 1, "stage 1 must be remembered");
+
+// 1 -> 2: a single plus button, still draggable on its own.
 panel = render("settings", plugin.SkinSettings);
 const foldAgain = find(panel, (child) => child.props?.["data-dsh-skin-fold"] !== undefined);
-assert(foldAgain !== null, "the folded panel must still carry its fold switch");
+assert(foldAgain !== null, "stage 1 must still carry its switch");
 foldAgain.props.onClick();
 panel = render("settings", plugin.SkinSettings);
-equal(panel.props["data-dsh-skin-folded"], undefined, "unfolding must restore the rows");
+equal(panel.props["data-dsh-skin-mini"], "", "stage 2 must shrink the panel to the plus button");
+equal(JSON.parse(storage.get("dsh.skin.win2000.ui")).stage, 2, "stage 2 must be remembered");
+const miniButton = find(panel, (child) => child.props?.["data-dsh-skin-fold"] !== undefined);
+assert(miniButton !== null, "the mini stage must render its plus button");
+assert(typeof miniButton.props.onPointerDown === "function", "the mini button must itself be draggable, since nothing else is left to grab");
+
+// 2 -> 0: back to the full panel with its rows.
+miniButton.props.onClick();
+panel = render("settings", plugin.SkinSettings);
+equal(panel.props["data-dsh-skin-mini"], undefined, "stage 0 must not be the mini stage");
+equal(panel.props["data-dsh-skin-folded"], undefined, "stage 0 must not be folded either");
+equal(JSON.parse(storage.get("dsh.skin.win2000.ui")).stage, 0, "the cycle must return to stage 0");
+assert(panel.children.length > 2, "stage 0 must show the rows again");
 
 for (const cleanup of effects) cleanup();
 equal(body.getAttribute("data-dsh-skin"), null, "dispose must strip the skin attribute");

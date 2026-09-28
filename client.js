@@ -429,6 +429,8 @@ body[data-dsh-skin="win2000"][data-dsh-skin-pixel] :is(strong,b){text-shadow:1px
 [data-dsh-skin-panel] [data-dsh-skin-title]{padding:3px 10px;color:#000}
 [data-dsh-skin-panelbar]{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 3px 3px 7px;margin:0 0 3px;background:linear-gradient(90deg,#0A246A 0%,#A6CAF0 100%);cursor:move;touch-action:none;user-select:none}
 [data-dsh-skin-panel][data-dsh-skin-folded] [data-dsh-skin-panelbar]{margin:0}
+[data-dsh-skin-panel][data-dsh-skin-mini]{min-width:0;padding:2px;gap:0}
+[data-dsh-skin-panel][data-dsh-skin-mini] [data-dsh-skin-fold]{width:22px;height:22px;font-size:12px;line-height:1;cursor:move}
 [data-dsh-skin-paneltitle]{color:#EDEDED;font-weight:bold;font-size:11px}
 [data-dsh-skin-panelbar] [data-dsh-skin-fold]{width:18px;height:16px;padding:0;display:flex;align-items:center;justify-content:center;color:#000;background:#D4D0C8;border:0;border-radius:0;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080;font-size:10px;line-height:1;cursor:pointer}
 [data-dsh-skin-panelbar] [data-dsh-skin-fold]:active{box-shadow:inset 1px 1px 0 #000000,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #808080,inset -2px -2px 0 #DFDFDF}
@@ -660,13 +662,16 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
         const readUi = () => {
             try {
                 const parsed = JSON.parse(localStorage.getItem(UI_KEY) ?? "{}");
+                const stage = Number.isInteger(parsed.stage)
+                    ? Math.min(2, Math.max(0, parsed.stage))
+                    : parsed.folded === true ? 1 : 0;
                 return {
                     x: Number.isFinite(parsed.x) ? parsed.x : null,
                     y: Number.isFinite(parsed.y) ? parsed.y : null,
-                    folded: parsed.folded === true,
+                    stage,
                 };
             } catch {
-                return { x: null, y: null, folded: false };
+                return { x: null, y: null, stage: 0 };
             }
         };
         const writeUi = (ui) => {
@@ -702,8 +707,8 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
 
             // Drag from anywhere on the title bar; pointer capture keeps the
             // gesture alive when the cursor leaves the small strip.
-            const onPointerDown = (event) => {
-                if (event.target.closest("[data-dsh-skin-fold]") !== null) return;
+            const onPointerDown = (event, fromMini = false) => {
+                if (!fromMini && event.target.closest("[data-dsh-skin-fold]") !== null) return;
                 const panel = event.currentTarget.parentElement;
                 const rect = panel.getBoundingClientRect();
                 drag.current = { dx: event.clientX - rect.left, dy: event.clientY - rect.top };
@@ -725,13 +730,23 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
             };
 
             // Viewport clamping: ensures panel never falls off the screen when expanded or moved
-            const panelHeight = ui.folded ? 24 : 240;
+            const panelHeight = ui.stage === 0 ? 240 : 24;
             const panelWidth = 160;
             let safeX = ui.x;
             let safeY = ui.y;
             if (safeX !== null) safeX = Math.max(8, Math.min(safeX, (typeof window !== "undefined" ? window.innerWidth : 1200) - panelWidth - 8));
             if (safeY !== null) safeY = Math.max(8, Math.min(safeY, (typeof window !== "undefined" ? window.innerHeight : 800) - panelHeight - 8));
             const style = safeX === null || safeY === null ? undefined : { left: safeX + "px", top: safeY + "px", right: "auto", bottom: "auto" };
+
+            /** 0 -> 1 -> 2 -> 0: full, title bar, single plus. */
+            const cycleStage = () => {
+                const next = (ui.stage + 1) % 3;
+                let nextY = ui.y;
+                if (next === 0 && ui.y !== null && typeof window !== "undefined") {
+                    nextY = Math.max(8, Math.min(ui.y, window.innerHeight - 250));
+                }
+                chrome({ stage: next, y: nextY });
+            };
 
             const titleBar = React.createElement("div", {
                 "data-dsh-skin-panelbar": "",
@@ -746,19 +761,26 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
             React.createElement("button", {
                 type: "button",
                 "data-dsh-skin-fold": "",
-                "aria-expanded": ui.folded ? "false" : "true",
-                title: ui.folded ? "展开设置" : "收起设置",
-                onClick: () => {
-                    const nextFolded = !ui.folded;
-                    let nextY = ui.y;
-                    if (!nextFolded && ui.y !== null && typeof window !== "undefined") {
-                        nextY = Math.max(8, Math.min(ui.y, window.innerHeight - 250));
-                    }
-                    chrome({ folded: nextFolded, y: nextY });
-                },
-            }, ui.folded ? "+" : "\u2013"));
+                "aria-expanded": ui.stage === 0 ? "true" : "false",
+                title: ui.stage === 0 ? "收起成标题栏" : "彻底隐藏成小按钮",
+                onClick: cycleStage,
+            }, ui.stage === 0 ? "\u2013" : "\u002b"));
 
-            if (ui.folded) {
+            if (ui.stage === 2) {
+                return React.createElement("div", { "data-dsh-skin-panel": "", "data-dsh-skin-mini": "", style },
+                    React.createElement("button", {
+                        type: "button",
+                        "data-dsh-skin-fold": "",
+                        title: "展开设置",
+                        onClick: cycleStage,
+                        onPointerDown: (event) => { onPointerDown(event, true); },
+                        onPointerMove,
+                        onPointerUp,
+                        onPointerCancel: onPointerUp,
+                    }, "\u002b"));
+            }
+
+            if (ui.stage === 1) {
                 return React.createElement("div", { "data-dsh-skin-panel": "", "data-dsh-skin-folded": "", style }, titleBar);
             }
 
