@@ -164,6 +164,9 @@ for (const token of ["--dsw-radius-xs", "--dsw-radius-sm", "--dsw-radius-md", "-
     assert(css.includes(token + ":0px !important"), "radius token " + token + " must be zeroed at the source");
 }
 assert(css.includes("--dsw-corner-shape:round"), "the superellipse must stay a plain corner");
+// The theme package insets the thumb with background-clip:content-box, which put
+// the painted box 1px narrower and 1px left of the trough; the skin must undo it.
+assert(css.includes("::-webkit-scrollbar-thumb{background:#D4D0C8;background-clip:border-box !important;border:0 !important"), "the thumb must paint its whole box, not the theme package\u0027s content box");
 assert(!/:where\([^)]*\)\{[^}]*border-radius/.test(css), "the square-corner rule may not use :where(), whose specificity is zero");
 assert(!/#(?:FFFFFF|ffffff)\b/.test(css), "no pure white may survive anywhere in the skin");
 assert(css.includes('font-family:"unsciiCJKV18",monospace'), "the bundled face must lead the type stack, with no unshipped family behind it");
