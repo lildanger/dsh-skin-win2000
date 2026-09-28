@@ -27,9 +27,9 @@
 
 ![经典窗口](docs/screenshots/02-classic-window.png)
 
-### 配色系统 —— Windows Server 2003 度量表逐项落地
+### 设置界面 —— 表单控件、开关与列表上的皮肤
 
-![配色系统](docs/screenshots/03-color-system.png)
+![设置界面](docs/screenshots/03-settings.png)
 
 ---
 
@@ -117,7 +117,7 @@ node verify-metrics.mjs  # 对照 Windows Server 2003 度量表，纯白必须�
 - **11px 是全局字号** —— 这是度量表的一部分，正文与代码块一起降到 11px。
 - **`-webkit-font-smoothing: none` 在 Windows 的 Chromium 上不生效**，写了但改变不了渲染。
 - **直角是通杀的** —— 头像、状态圆点、开关滑块都会变方。需要保留圆形的话，从 `border-radius:0 !important` 的选择器里排除即可。
-- **截图为示意图** —— 仓库里的三张 PNG 由 `tools/make-screenshots.mjs` 用 SVG 按皮肤的真实取值绘制，用于展示配色与控件规格，不是运行中界面的实拍。
+- **截图是实拍** —— 仓库里的三张 PNG 由 `tools/capture.mjs` 通过 Chrome DevTools Protocol 抓取运行中的界面，皮肤状态为 `data-dsh-skin="win2003"`。抓图环境使用你本机的点阵字体与配色设置，所以字体观感会与你的设置一致。
 
 ## 开发
 
@@ -130,8 +130,8 @@ dsh-skin-win2003/
 ├── check.mjs             最小可运行检查
 ├── verify-metrics.mjs    度量表配色回归
 ├── tools/
-│   └── make-screenshots.mjs  用 sharp 渲染 README 截图
-├── docs/screenshots/     README 用的三张 PNG
+│   └── capture.mjs      通过 CDP 抓取运行中界面的真实截图
+├── docs/screenshots/     README 用的三张实拍 PNG
 └── HANDOFF.md            交接文档：结构、行号、踩坑记录
 ```
 

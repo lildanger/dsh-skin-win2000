@@ -27,9 +27,9 @@ Classic grey controls, two-tone gradient title bars, 1px bevels, hard square cor
 
 ![Classic window](docs/screenshots/02-classic-window.png)
 
-### The colour system — the metric table, mapped row by row
+### The settings surface — form controls, switches and lists
 
-![Colour system](docs/screenshots/03-color-system.png)
+![Settings](docs/screenshots/03-settings.png)
 
 ---
 
@@ -117,7 +117,7 @@ node verify-metrics.mjs  # the Windows Server 2003 metric table; pure white must
 - **11px is global** — it is part of the metric table, so body text and code blocks drop to 11px along with the controls.
 - **`-webkit-font-smoothing: none` does nothing on Windows Chromium** (it renders through DirectWrite). It is declared, but it cannot change the rendering there.
 - **Square corners are indiscriminate** — avatars, status dots and switch knobs all become squares. To keep circles, exclude them from the `border-radius:0 !important` selector.
-- **The screenshots are diagrams** — the three PNGs are drawn from the skin's real values by `tools/make-screenshots.mjs` (SVG rasterised with sharp) to document the palette and control specification. They are not photographs of a running interface.
+- **The screenshots are captures** — the three PNGs are taken from a running interface by `tools/capture.mjs` over the Chrome DevTools Protocol, with the skin mounted (`data-dsh-skin="win2003"`). The capture machine uses this author's bitmap-font and palette settings, so type rendering follows those settings.
 
 ## Development
 
@@ -130,8 +130,8 @@ dsh-skin-win2003/
 ├── check.mjs             minimal runnable check
 ├── verify-metrics.mjs    colour regression against the metric table
 ├── tools/
-│   └── make-screenshots.mjs  renders the README images with sharp
-├── docs/screenshots/     the three PNGs used above
+│   └── capture.mjs       captures the README images over CDP
+├── docs/screenshots/     the three captured PNGs used above
 └── HANDOFF.md            handoff notes: structure, line numbers, pitfalls
 ```
 
