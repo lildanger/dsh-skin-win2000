@@ -2,7 +2,7 @@
 
 # dsh-skin-win2000
 
-**Windows Server 2003 for the DeepSeek Harness Web GUI.**
+**Windows 2000 for the DeepSeek Harness Web GUI.**
 
 Classic grey controls, two-tone gradient title bars, 1px bevels, hard square corners, a 16px scrollbar.
 
@@ -35,7 +35,7 @@ Classic grey controls, two-tone gradient title bars, 1px bevels, hard square cor
 
 ## What this is
 
-A **client plugin** for DSH (DeepSeek Harness) that repaints the Web GUI in the visual language of Windows Server 2003. Install it and it applies itself; a draggable, collapsible panel appears in the bottom-right corner, and one click turns the skin off, restoring DSH exactly as it was.
+A **client plugin** for DSH (DeepSeek Harness) that repaints the Web GUI in the visual language of Windows 2000. Install it and it applies itself; a draggable, collapsible panel appears in the bottom-right corner, and one click turns the skin off, restoring DSH exactly as it was.
 
 It does not approximate the era — it takes its values from the era's metric table. Control surfaces, both ends of the active title-bar gradient, the inactive gradient, the three shading greys, the selection highlight: every one of them corresponds to a row in the Windows System Metrics table, and `verify-metrics.mjs` in this repository compares the shipped values against that table and fails when they drift.
 
@@ -112,7 +112,7 @@ The panel in the bottom-right corner:
 |---|---|
 | Title bar | Drag the whole panel anywhere; the position is remembered in localStorage. **Double-click** to send it back to the corner |
 | Button at the right | **Three stages, cycled**: full panel → title bar only → a single small plus → back to the full panel |
-| 启用皮肤 (Enable skin) | Toggles the skin. Switching it off restores DSH exactly as it was, while the panel keeps its 2003 chrome so you can switch back |
+| 启用皮肤 (Enable skin) | Toggles the skin. Switching it off restores DSH exactly as it was, while the panel keeps its 2000 chrome so you can switch back |
 | 点阵字体 (Bitmap font) | Toggles the bitmap face that ships with the package; switch it off and your own font settings apply |
 | 窗口示例 (Window specimen) | Opens a fully reproduced classic dialog: title bar with the three title buttons, menu bar, sunken client area, three-panel status bar and an action row. Click `×` to see the inactive gradient |
 
@@ -140,7 +140,7 @@ Two runnable checks ship with the repository. Neither needs a browser:
 
 ```bash
 node check.mjs           # spec values, stylesheet, panel and window interactions, dispose
-node verify-metrics.mjs  # the Windows Server 2003 metric table; pure white must be 0
+node verify-metrics.mjs  # the Windows 2000 metric table; pure white must be 0
 ```
 
 `check.mjs` drives the plugin through stubs (module loader, React, DOM) and covers: every `SPEC` constant, the three bevel states, both title-bar gradients, the 11px type size, the absence of any font takeover, the zeroed radii, square scrollbars, the panel and window rules, the bubble colour, the projection attributes, panel folding and the skin switch, the specimen window's title bar / menu / status bar / action row, and the cleanup path.

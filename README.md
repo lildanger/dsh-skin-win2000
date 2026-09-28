@@ -2,7 +2,7 @@
 
 # dsh-skin-win2000
 
-**给 DeepSeek Harness Web GUI 换上一身 Windows Server 2003 的皮。**
+**给 DeepSeek Harness Web GUI 换上一身 Windows 2000 的皮。**
 
 经典中性灰控件、双色渐变标题栏、1px 立体浮雕、绝对直角、16px 经典滚动条。
 
@@ -35,7 +35,7 @@
 
 ## 这是什么
 
-一个 DSH（DeepSeek Harness）的**客户端插件**，把 Web GUI 的画布整体换成 Windows Server 2003 的视觉语言。装上即生效，右下角会出现一个可拖动、可折叠的控制面板；点一下就能关掉皮肤，界面立刻恢复 DSH 原样。
+一个 DSH（DeepSeek Harness）的**客户端插件**，把 Web GUI 的画布整体换成 Windows 2000 的视觉语言。装上即生效，右下角会出现一个可拖动、可折叠的控制面板；点一下就能关掉皮肤，界面立刻恢复 DSH 原样。
 
 它不做"大概像那个年代"，而是**按度量表逐项取值**：控件表面、标题栏两端的渐变色、失焦渐变色、三级投影灰、选中高亮——每一项都能在那个年代的 System Metrics 表里找到对应行。仓库里的 `verify-metrics.mjs` 会拿代码里的实际取值去比对这张表，对不上就报错。
 
@@ -112,7 +112,7 @@ dsh plugin --profile web add link:/path/to/dsh-skin-win2000
 |---|---|
 | 标题栏 | 按住即可拖动整个面板，位置记在 localStorage；**双击**回到右下角 |
 | 右上角按钮 | **三档循环**：完整面板 → 只剩标题栏 → 一个小 ＋ → 回到完整面板 |
-| 启用皮肤 | 开关皮肤。关掉后界面恢复 DSH 原样，面板本身仍保持 2003 外观，方便随时开回来 |
+| 启用皮肤 | 开关皮肤。关掉后界面恢复 DSH 原样，面板本身仍保持 2000 外观，方便随时开回来 |
 | 点阵字体 | 开关随包分发的点阵字体；关掉就用你自己的字体设置 |
 | 窗口示例 | 弹出一个完整复刻的经典对话框：标题栏 + 三个标题按钮 + 菜单栏 + 凹陷客户区 + 三段状态栏 + 操作按钮行，点标题栏的 `×` 可看失焦渐变 |
 
@@ -140,7 +140,7 @@ dsh plugin --profile web add link:/path/to/dsh-skin-win2000
 
 ```bash
 node check.mjs           # 规范值、样式表、面板与窗口交互、dispose 清理
-node verify-metrics.mjs  # 对照 Windows Server 2003 度量表，纯白必须为 0
+node verify-metrics.mjs  # 对照 Windows 2000 度量表，纯白必须为 0
 ```
 
 `check.mjs` 用桩件（module loader / React / DOM）把插件跑一遍，覆盖：SPEC 常量逐值、三态立体阴影、标题栏双向渐变、11px 字号、无字体接管、radius 全归零、滚动条直角、面板与窗口规则、气泡配色、投影三属性、面板折叠与开关、窗口示例的标题栏/菜单/状态栏/操作按钮，以及卸载后的清理。

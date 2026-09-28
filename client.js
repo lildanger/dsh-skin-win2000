@@ -1,10 +1,10 @@
-// dsh-skin-win2000 — client half: the Windows 2003 (Luna) chrome.
+// dsh-skin-win2000 — client half: the Windows 2000 (Luna) chrome.
 //
 // The shipped Appearance row lists only light/dark/system, so a third-party
 // theme id has no seat there. The skin drives the document itself:
 //
 //   1. one stylesheet scoped to `body[data-dsh-skin="win2000"]`, carrying the
-//      Windows 2003 palette over the design
+//      Windows 2000 palette over the design
 //      system's alias and specific tokens, plus what tokens cannot express:
 //      square corners, the classic bevels and 3D scrollbars. The type stack
 //      leads with unsciiCJKV18 while the pixel-font switch is on; switching it
@@ -34,7 +34,7 @@ window.__ModuleLoader__.load({
          * hard 1px outlines. Keys are the design system's alias and specific
          * tokens (`--dsw-menu-surface-fill` among them).
          */
-        const WIN2003_TOKENS = {
+        const WIN2000_TOKENS = {
             /* surfaces — grey chrome, white document area, white fields */
             "--dsw-alias-bg-base": "#D4D0C8",
             "--dsw-alias-bg-layer-1": "#D4D0C8",
@@ -284,7 +284,7 @@ window.__ModuleLoader__.load({
 
         /**
          * The XP Luna face: beige chrome, blue title-bar accents. Only the
-         * values that differ from {@link WIN2003_TOKENS} — the variant rule is
+         * values that differ from {@link WIN2000_TOKENS} — the variant rule is
          * emitted after the base one, so it wins per property.
          */
         const LUNA_TOKENS = {
@@ -353,7 +353,7 @@ window.__ModuleLoader__.load({
         const TOKEN_SLOT = "@@TOKENS@@";
         const LUNA_SLOT = "@@LUNA@@";
         const buildStylesheet = () => STYLESHEET
-            .split(TOKEN_SLOT).join(declarations(WIN2003_TOKENS))
+            .split(TOKEN_SLOT).join(declarations(WIN2000_TOKENS))
             .split(LUNA_SLOT).join(declarations(LUNA_TOKENS));
 
         const STYLESHEET = `
@@ -544,10 +544,10 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
             writeSettings(settings);
         }
 
-        /** One palette only: Windows 2003 Luna. A second accent set is what made
-         *  the interface carry colours the Windows 2003 scheme does not own. */
+        /** One palette only: Windows 2000 Luna. A second accent set is what made
+         *  the interface carry colours the Windows 2000 scheme does not own. */
         const PALETTES = [
-            { id: "luna", label: "Windows 2003", mark: "#0A246A" },
+            { id: "luna", label: "Windows 2000", mark: "#0A246A" },
         ];
 
         /** The demo window's menu bar. Each menu opens a navy dropdown. */
@@ -654,7 +654,7 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
             React.createElement("div", { "data-dsh-skin-status": "" },
                 React.createElement("span", "", "就绪"),
                 React.createElement("span", "", `对象: ${String(MENUS.length)} 个菜单`),
-                React.createElement("span", "", "Windows 2003 配色")),
+                React.createElement("span", "", "Windows 2000 配色")),
             React.createElement("div", { "data-dsh-skin-actions": "" },
                 React.createElement("button", { type: "button", onClick: () => { setInactive(false); } }, "激活(&A)"),
                 React.createElement("button", { type: "button" }, "确定"),

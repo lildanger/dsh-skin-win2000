@@ -1,4 +1,4 @@
-// Compare the shipped stylesheet against the Windows Server 2003 metrics table.
+// Compare the shipped stylesheet against the Windows 2000 metrics table.
 import { readFileSync } from "node:fs";
 import { createContext, runInContext } from "node:vm";
 

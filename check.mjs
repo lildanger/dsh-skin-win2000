@@ -197,7 +197,7 @@ assert(css.includes("nav[aria-label] button[data-index]:hover"), "hover must be 
 // Borrowing a system bold face was tried and reverted: Consolas advances 8.8px
 // against the pixel grid's 8px, so every Latin column drifted ~10% and the
 // layout came apart. Any bold face used here must share the grid's metrics.
-assert(!css.includes("Win2003 Latin"), "no borrowed Latin face: its advance must match the 8px pixel grid exactly");
+assert(!css.includes("Win2000 Latin"), "no borrowed Latin face: its advance must match the 8px pixel grid exactly");
 assert(!css.includes("data-dsh-skin-mono"), "the code font axis must be gone: the code face follows the interface face");
 assert(css.includes(":is(button,summary)"), "real controls must carry the classic bevel");
 assert(!/:is\([^)]*\[role="button"\][^)]*\)\{box-shadow/.test(css), "chat rows with role=button must never be beveled: tool calls and reasoning rows stay borderless");
@@ -213,7 +213,7 @@ assert(scrollbarRule !== undefined, "the scrollbar parts need their own rule: `*
 assert(scrollbarRule.includes("border-radius:0 !important"), "the scrollbar parts must be square");
 assert(css.includes("[data-dsh-skin-window]"), "the specimen window must be styled by the same sheet");
 const tokenCount = [...css.matchAll(/--dsw-[a-z0-9-]+:/g)].length;
-equal(tokenCount, 250, "token declarations: the Windows 2003 palette, the static ramp and the six radius tokens");
+equal(tokenCount, 250, "token declarations: the Windows 2000 palette, the static ramp and the six radius tokens");
 const shikiCount = [...css.matchAll(/--shiki-[a-z-]+:/g)].length;
 equal(shikiCount, 11, "syntax colours must be re-tuned for the deep grey code surface");
 assert(css.includes("--shiki-background:#C8C4BC"), "the syntax background must match the code surface");
@@ -222,7 +222,7 @@ assert(css.includes("--dsw-linear-gradient-think:linear-gradient(180deg,#D4D0C8"
 
 // ---- projection ---------------------------------------------------------
 equal(body.getAttribute("data-dsh-skin"), "win2000", "apply must dress the document");
-equal(body.getAttribute("data-dsh-skin-variant"), "luna", "the skin is Windows 2003 Luna");
+equal(body.getAttribute("data-dsh-skin-variant"), "luna", "the skin is Windows 2000 Luna");
 equal(body.getAttribute("data-dsh-skin-pixel"), "unsciicjkv", "apply must turn the CJKV18 face on");
 equal(attributes.get("color-scheme"), "light", "the skin must pin the light color scheme");
 assert(slots.includes("shell.overlay#dsh-skin-win2000-settings"), "the settings panel must be registered into shell.overlay");

@@ -1,19 +1,19 @@
 # HANDOFF — dsh-skin-win2000
 
-DSH Web GUI 的 Windows Server 2003 皮肤插件。单文件客户端 bundle，无构建步骤。
+DSH Web GUI 的 Windows 2000 皮肤插件。单文件客户端 bundle，无构建步骤。
 
 ---
 
 ## 1. 目标与验收
 
-把 DSH Web GUI 的外观换成 Windows Server 2003 经典控件风格：中性灰 3D 浮雕、双色渐变标题栏、直角、深灰代码块、无纯白。
+把 DSH Web GUI 的外观换成 Windows 2000 经典控件风格：中性灰 3D 浮雕、双色渐变标题栏、直角、深灰代码块、无纯白。
 
 验收口径（全部可执行）：
 
 | 检查 | 命令 | 通过条件 |
 |---|---|---|
 | 规范值与样式完整性 | `node check.mjs` | `ok — spec verified, …` |
-| 配色对齐 Win2003 度量表 | `node verify-metrics.mjs` | `全部对齐度量表`，`纯白出现次数: 0` |
+| 配色对齐 Win2000 度量表 | `node verify-metrics.mjs` | `全部对齐度量表`，`纯白出现次数: 0` |
 | 语法 | `node --check client.js` | 退出码 0 |
 
 ---
@@ -27,7 +27,7 @@ D:\Desktop\fuck\DSH\dsh-skin-win2000\      ← 源码（工作目录内）
 ├── index.js              宿主半：注册 webServer 前缀路由 /api/dsh-skin-win2000/fonts/
 ├── client.js             全部实现（约 830 行，单文件无构建产物；行数随编辑漂移，仅作规模参考）
 ├── check.mjs             最小可运行检查（stub module loader + React + DOM）
-└── verify-metrics.mjs    对照 Win2003 度量表的配色回归
+└── verify-metrics.mjs    对照 Win2000 度量表的配色回归
 ```
 
 字体服务（`index.js`）：`ctx.webServer.register({kind:"prefix", path:"/api/dsh-skin-win2000/fonts/"})`
@@ -60,14 +60,14 @@ unsciiCJKV / unsciiCJKV18），其余走同名兜底。`client.js` 的 `@font-fa
 |---|---|
 | 文件头注释 | 说明为何不走 `ctx.theme.register()`；**禁止裸反引号**（坑 2） |
 | `React` / `SKIN_ATTRIBUTE` / `SKIN_VALUE` / `STORAGE_KEY` / `PIXEL_VALUE` | 皮肤属性 `data-dsh-skin="win2000"`、点阵属性值 `unsciicjkv` |
-| `WIN2003_TOKENS` | 主配色表（250 项里的绝大部分） |
+| `WIN2000_TOKENS` | 主配色表（250 项里的绝大部分） |
 | `LUNA_TOKENS` | 变体差异表（当前只留少量覆盖） |
 | `declarations()` | 把 token 表摊平成 `--x:#y !important;…` |
 | `TOKEN_SLOT` / `LUNA_SLOT` / `buildStylesheet()` | 运行时把 token 注入样式表（见第 7 节坑 2） |
 | `STYLESHEET` | 全部 CSS 规则（含 `@font-face` 与点阵字体规则） |
 | `readSettings` / `writeSettings` | `enabled` + `pixel`，存 `dsh.skin.win2000` |
 | `project()` | 把设置投影到 DOM：`data-dsh-skin` / `-variant` / `-pixel` / `color-scheme` |
-| `PALETTES` | 配色列表（目前只有 Windows 2003 Luna；面板未消费，`variant` 也固定 `luna`） |
+| `PALETTES` | 配色列表（目前只有 Windows 2000 Luna；面板未消费，`variant` 也固定 `luna`） |
 | `MENUS` | 窗口示例的菜单栏数据 |
 | `SPEC` | **规范值常量表**，check 直接断言它 |
 | `ClassicWindow()` | 窗口示例组件（标题栏 + 三个标题按钮 + 菜单栏 + 客户区 + 状态栏 + 操作按钮） |
@@ -79,7 +79,7 @@ unsciiCJKV / unsciiCJKV18），其余走同名兜底。`client.js` 的 `@font-fa
 
 ---
 
-## 4. 配色规范（Win2003 度量表，已逐项对齐）
+## 4. 配色规范（Win2000 度量表，已逐项对齐）
 
 | 界面元素 | 值 | 落地位置 |
 |---|---|---|
@@ -105,7 +105,7 @@ unsciiCJKV / unsciiCJKV18），其余走同名兜底。`client.js` 的 `@font-fa
 
 | 规则 | 作用 |
 |---|---|
-| `body[data-dsh-skin="win2000"]{…}` | 注入 WIN2003 token（`@@TOKENS@@` 槽位）+ 3D 阴影变量 + `font-size:11px` + `-webkit-font-smoothing:none` |
+| `body[data-dsh-skin="win2000"]{…}` | 注入 WIN2000 token（`@@TOKENS@@` 槽位）+ 3D 阴影变量 + `font-size:11px` + `-webkit-font-smoothing:none` |
 | `… :is(button,summary){box-shadow:var(--dsh-skin-shadow-raised)}` | 按钮凸起 |
 | `… :is(input,textarea,select,…){box-shadow:var(--dsh-skin-shadow-sunken)}` | 输入框凹陷 |
 | `… :is([role="dialog"],[role="alertdialog"]){…}` | 对话框凸起 |
@@ -131,7 +131,7 @@ unsciiCJKV / unsciiCJKV18），其余走同名兜底。`client.js` 的 `@font-fa
 - **默认：皮肤开启 + 点阵字体开启**（localStorage 无记录 → `{enabled: true, pixel: true}`）。
 - **浮窗开关状态鲜明**：开启/选中的开关（「启用皮肤」、「点阵字体」）以**深海军蓝 `#0A246A` 高亮底色 + 反白文字 `#EDEDED` + 黑色对勾 ✔** 呈现，关闭项恢复平色灰底与空白框。
 - **主字体 = `unsciiCJKV18`**，由 `data-dsh-skin-pixel="unsciicjkv"` 驱动全局组件（CSS 用无值选择器 `[data-dsh-skin-pixel]`，属性值只作标识）。**代码/等宽字体不再单独可调**：它跟随主字体；关掉点阵开关就一起回到用户字体。
-- 关闭皮肤 = 移除 `data-dsh-skin`、`data-dsh-skin-variant` 及 `data-dsh-skin-pixel`、释放 `color-scheme`；面板与窗口因自包含而**保持 2003 外观**，方便随时开回来。
+- 关闭皮肤 = 移除 `data-dsh-skin`、`data-dsh-skin-variant` 及 `data-dsh-skin-pixel`、释放 `color-scheme`；面板与窗口因自包含而**保持 2000 外观**，方便随时开回来。
 - 卸载插件（`ctx.effect` 清理）会移除 `<style>`、清掉所有属性、删除两个 localStorage 键。
 
 **为什么不注册主题**：DSH「设置 → 通用 → 外观」那一行是写死的 `light/dark/system` 三个方块，第三方主题 id 进不去。皮肤因此自己驱动 `body` 属性。
@@ -166,10 +166,10 @@ unsciiCJKV / unsciiCJKV18），其余走同名兜底。`client.js` 的 `@font-fa
 cd D:\Desktop\fuck\DSH\dsh-skin-win2000
 node --check client.js        # 语法
 node check.mjs                # 250 tokens / 规范值 / 字体约定 / 投影 / 面板与窗口交互 / dispose
-node verify-metrics.mjs       # 对照 Win2003 度量表，纯白必须为 0
+node verify-metrics.mjs       # 对照 Win2000 度量表，纯白必须为 0
 ```
 
-`check.mjs` 覆盖：SPEC 常量逐值、样式表逐条（阴影三态、标题栏渐变、11px、无纯白、radius 归零、滚动条直角、面板/窗口规则、气泡规则）、**字体约定**（CJKV18 居字体族首位、`font-synthesis:none` 在位、`text-rendering:optimizeSpeed` 在位且全表不得出现 `geometricPrecision`、1px 叠印规则在位、全表不得再出现 `data-dsh-skin-mono`、不得再出现借来的 `Win2003 Latin` 面）、投影属性（含默认点阵）、面板三行与折叠、窗口示例的标题栏/菜单/状态栏/操作按钮及其交互、dispose 清理。
+`check.mjs` 覆盖：SPEC 常量逐值、样式表逐条（阴影三态、标题栏渐变、11px、无纯白、radius 归零、滚动条直角、面板/窗口规则、气泡规则）、**字体约定**（CJKV18 居字体族首位、`font-synthesis:none` 在位、`text-rendering:optimizeSpeed` 在位且全表不得出现 `geometricPrecision`、1px 叠印规则在位、全表不得再出现 `data-dsh-skin-mono`、不得再出现借来的 `Win2000 Latin` 面）、投影属性（含默认点阵）、面板三行与折叠、窗口示例的标题栏/菜单/状态栏/操作按钮及其交互、dispose 清理。
 
 **运行时核对**（host 侧，不需要浏览器）：
 
@@ -184,7 +184,7 @@ curl.exe -g -s "http://127.0.0.1:3080/" | Select-String "dsh-skin-win2000"
 
 1. **依赖哈希类名**：`[class*="bubble"]`、`[class*="_card"]`、`[class*="bubble"]` 这类选择器依赖组件库的 CSS-module 命名。DSH 升级后若命名变化，这两条会静默失效（症状：气泡或卡片配色回到默认）。
 2. **`--dsw-static-*` 被改写过**：皮肤的静态色阶不是 DSH 原值。若有组件把"静态最亮档"当**文字色**用（气泡就是例证），会出现浅底浅字。新增 UI 元素时留意。
-3. **11px 全局字号**是 Win2003 规范的一部分，正文与代码块一起降到了 11px。
+3. **11px 全局字号**是 Win2000 规范的一部分，正文与代码块一起降到了 11px。
 4. **`-webkit-font-smoothing: none` 在 Windows 的 Chromium 上不生效**（走 DirectWrite），写了但改变不了渲染。点阵字的锐利度实际靠 **`text-rendering:optimizeSpeed`** 让字形吸附整数像素来保证（见第 8 条）——那一句才是真正起作用的。
 5. **字体由皮肤接管**：点阵开关打开时（默认打开）`unsciiCJKV18` 覆盖全局 `font-family` 并把字号抬到 16px，`dsh-ui-font` 的设置会被压过；关掉开关才回到用户字体。窗口标题按钮另用 Marlett 符号字形。
 6. **直角是通杀的**：头像、状态圆点、开关滑块都会变方。若需要保留圆形，从 `border-radius:0 !important` 的选择器里排除即可。
