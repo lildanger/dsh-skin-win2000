@@ -1,0 +1,24 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      dsh-win-terminal-inspector:
+        specifier: git+https://github.com/clearkurt/dsh-win-terminal-inspector.git
+        version: git+https://github.com/clearkurt/dsh-win-terminal-inspector.git#c8c5e5afb50a7fd04aa0db8c313eb150cb7bc5b6
+
+packages:
+
+  dsh-win-terminal-inspector@git+https://github.com/clearkurt/dsh-win-terminal-inspector.git#c8c5e5afb50a7fd04aa0db8c313eb150cb7bc5b6:
+    resolution: {commit: c8c5e5afb50a7fd04aa0db8c313eb150cb7bc5b6, repo: https://github.com/clearkurt/dsh-win-terminal-inspector.git, type: git}
+    version: 1.0.0
+    engines: {node: '>=22'}
+
+snapshots:
+
+  dsh-win-terminal-inspector@git+https://github.com/clearkurt/dsh-win-terminal-inspector.git#c8c5e5afb50a7fd04aa0db8c313eb150cb7bc5b6: {}

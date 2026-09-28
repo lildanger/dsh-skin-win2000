@@ -1,0 +1,8 @@
+# dsh-skin-win2000 bundle patch: inserts the skin row into the web profile
+# roster. Activate with `dsh plugin --profile <name> add link:<path>`.
+- insert:
+    - id: skin-win2000
+      name: 'dsh-skin-win2000'
+      inject:
+        - webServer
+
