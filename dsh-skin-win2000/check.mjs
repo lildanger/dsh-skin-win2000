@@ -100,7 +100,7 @@ const render = (key, component) => {
     return call(component, instance(key));
 };
 
-equal(bundle.id, "dsh-skin-win2003", "bundle id must match the package");
+equal(bundle.id, "dsh-skin-win2000", "bundle id must match the package");
 assert(typeof plugin.apply === "function", "the client half must export apply");
 assert(Array.isArray(plugin.inject) && plugin.inject[0] === "slots", `the skin needs the slots service, got ${JSON.stringify(plugin.inject)}`);
 
@@ -136,7 +136,7 @@ plugin.apply(ctx);
 
 assert(stylesheet !== undefined, "apply must inject a stylesheet");
 const css = stylesheet.textContent;
-assert(css.includes('body[data-dsh-skin="win2003"]'), "the stylesheet must be scoped to the skin attribute");
+assert(css.includes('body[data-dsh-skin="win2000"]'), "the stylesheet must be scoped to the skin attribute");
 assert(css.includes(`--dsh-skin-shadow-raised:${spec.outset}`), "the outset bevel must reach the stylesheet verbatim");
 assert(css.includes(`--dsh-skin-shadow-sunken:${spec.inset}`), "the inset bevel must reach the stylesheet verbatim");
 assert(css.includes(`--dsh-skin-shadow-active:${spec.active}`), "the pressed bevel must reach the stylesheet verbatim");
@@ -198,11 +198,11 @@ assert(css.includes("--dsw-static-neutral-00:#EDEDED !important"), "the static r
 assert(css.includes("--dsw-linear-gradient-think:linear-gradient(180deg,#D4D0C8"), "the reasoning wash must be repainted");
 
 // ---- projection ---------------------------------------------------------
-equal(body.getAttribute("data-dsh-skin"), "win2003", "apply must dress the document");
+equal(body.getAttribute("data-dsh-skin"), "win2000", "apply must dress the document");
 equal(body.getAttribute("data-dsh-skin-variant"), "luna", "the skin is Windows 2003 Luna");
 equal(body.getAttribute("data-dsh-skin-pixel"), "unsciicjkv", "apply must turn the CJKV18 face on");
 equal(attributes.get("color-scheme"), "light", "the skin must pin the light color scheme");
-assert(slots.includes("shell.overlay#dsh-skin-win2003-settings"), "the settings panel must be registered into shell.overlay");
+assert(slots.includes("shell.overlay#dsh-skin-win2000-settings"), "the settings panel must be registered into shell.overlay");
 
 // ---- the specimen window ------------------------------------------------
 const find = (node, predicate) => {
@@ -294,7 +294,7 @@ equal(body.getAttribute("data-dsh-skin-variant"), null, "switching off must clea
 equal(body.getAttribute("data-dsh-skin-pixel"), null, "switching off must clear the pixel font attribute");
 equal(attributes.get("color-scheme"), "", "switching off must release the color scheme");
 row(render("settings", plugin.SkinSettings), "启用皮肤").props.onClick();
-equal(body.getAttribute("data-dsh-skin"), "win2003", "switching back on must dress the document again");
+equal(body.getAttribute("data-dsh-skin"), "win2000", "switching back on must dress the document again");
 
 // Panel chrome: a draggable title bar and a fold switch that survives a re-render.
 panel = render("settings", plugin.SkinSettings);
@@ -306,7 +306,7 @@ assert(foldButton !== undefined, "the title bar needs a fold switch");
 foldButton.props.onClick();
 panel = render("settings", plugin.SkinSettings);
 equal(panel.props["data-dsh-skin-folded"], "", "folding must collapse the panel to its title bar");
-assert(JSON.parse(storage.get("dsh.skin.win2003.ui")).folded === true, "the folded state must be remembered");
+assert(JSON.parse(storage.get("dsh.skin.win2000.ui")).folded === true, "the folded state must be remembered");
 panel = render("settings", plugin.SkinSettings);
 const foldAgain = find(panel, (child) => child.props?.["data-dsh-skin-fold"] !== undefined);
 assert(foldAgain !== null, "the folded panel must still carry its fold switch");
@@ -317,6 +317,6 @@ equal(panel.props["data-dsh-skin-folded"], undefined, "unfolding must restore th
 for (const cleanup of effects) cleanup();
 equal(body.getAttribute("data-dsh-skin"), null, "dispose must strip the skin attribute");
 equal(attributes.get("color-scheme"), "", "dispose must release the color scheme");
-equal(storage.get("dsh.skin.win2003"), undefined, "dispose must drop the remembered choices");
+equal(storage.get("dsh.skin.win2000"), undefined, "dispose must drop the remembered choices");
 
 console.log(`ok — spec verified, ${tokenCount} tokens, ${css.length} bytes of CSS, specimen window driven, panel driven, dispose clean`);

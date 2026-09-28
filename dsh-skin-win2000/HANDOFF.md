@@ -1,4 +1,4 @@
-# HANDOFF — dsh-skin-win2003
+# HANDOFF — dsh-skin-win2000
 
 DSH Web GUI 的 Windows Server 2003 皮肤插件。单文件客户端 bundle，无构建步骤。
 
@@ -21,16 +21,16 @@ DSH Web GUI 的 Windows Server 2003 皮肤插件。单文件客户端 bundle，�
 ## 2. 交付物与安装点
 
 ```
-D:\Desktop\fuck\DSH\dsh-skin-win2003\      ← 源码（工作目录内）
+D:\Desktop\fuck\DSH\dsh-skin-win2000\      ← 源码（工作目录内）
 ├── package.json          插件清单：name / exports / dsh.bundle / dsh.client
-├── cordis.patch.yml      bundle 层补丁：insert 一行 skin-win2003
-├── index.js              宿主半：注册 webServer 前缀路由 /api/dsh-skin-win2003/fonts/
+├── cordis.patch.yml      bundle 层补丁：insert 一行 skin-win2000
+├── index.js              宿主半：注册 webServer 前缀路由 /api/dsh-skin-win2000/fonts/
 ├── client.js             全部实现（约 830 行，单文件无构建产物；行数随编辑漂移，仅作规模参考）
 ├── check.mjs             最小可运行检查（stub module loader + React + DOM）
 └── verify-metrics.mjs    对照 Win2003 度量表的配色回归
 ```
 
-字体服务（`index.js`）：`ctx.webServer.register({kind:"prefix", path:"/api/dsh-skin-win2003/fonts/"})`
+字体服务（`index.js`）：`ctx.webServer.register({kind:"prefix", path:"/api/dsh-skin-win2000/fonts/"})`
 按文件名在两个目录里找字体——`%LOCALAPPDATA%\Microsoft\Windows\Fonts\` 与 `D:\fontwork\`——
 命中即以 `font/ttf` / `font/otf` 回源，未命中 404。`FONT_MAP` 只固化 4 个（zpix / unscii-16-full-orig /
 unsciiCJKV / unsciiCJKV18），其余走同名兜底。`client.js` 的 `@font-face` 优先 `local()`，
@@ -41,9 +41,9 @@ unsciiCJKV / unsciiCJKV18），其余走同名兜底。`client.js` 的 `@font-fa
 | 项 | 值 |
 |---|---|
 | profile | `web`（`~/.dsh/profiles/web`） |
-| 链接 | `node_modules/dsh-skin-win2003` → **Junction** 指向源码目录（改源码即时生效） |
-| profile 补丁 | `~/.dsh/profiles/web/cordis.patch.yml` 第 51-52 行：`insert: [{id: skin-win2003, name: dsh-skin-win2003}]` |
-| 浏览器入口 | `plugins/??dsh-skin-win2003/client.js&rev=<hash>`（host 按文件 mtime/size 生成 rev） |
+| 链接 | `node_modules/dsh-skin-win2000` → **Junction** 指向源码目录（改源码即时生效） |
+| profile 补丁 | `~/.dsh/profiles/web/cordis.patch.yml` 第 51-52 行：`insert: [{id: skin-win2000, name: dsh-skin-win2000}]` |
+| 浏览器入口 | `plugins/??dsh-skin-win2000/client.js&rev=<hash>`（host 按文件 mtime/size 生成 rev） |
 
 **未使用 pnpm**：没有写 profile 的 `package.json` 依赖，靠 junction + patch 行挂载，避免扰动该 profile 里那一大票 `link:` 依赖。
 
@@ -59,19 +59,19 @@ unsciiCJKV / unsciiCJKV18），其余走同名兜底。`client.js` 的 `@font-fa
 | 符号 | 职责 |
 |---|---|
 | 文件头注释 | 说明为何不走 `ctx.theme.register()`；**禁止裸反引号**（坑 2） |
-| `React` / `SKIN_ATTRIBUTE` / `SKIN_VALUE` / `STORAGE_KEY` / `PIXEL_VALUE` | 皮肤属性 `data-dsh-skin="win2003"`、点阵属性值 `unsciicjkv` |
+| `React` / `SKIN_ATTRIBUTE` / `SKIN_VALUE` / `STORAGE_KEY` / `PIXEL_VALUE` | 皮肤属性 `data-dsh-skin="win2000"`、点阵属性值 `unsciicjkv` |
 | `WIN2003_TOKENS` | 主配色表（250 项里的绝大部分） |
 | `LUNA_TOKENS` | 变体差异表（当前只留少量覆盖） |
 | `declarations()` | 把 token 表摊平成 `--x:#y !important;…` |
 | `TOKEN_SLOT` / `LUNA_SLOT` / `buildStylesheet()` | 运行时把 token 注入样式表（见第 7 节坑 2） |
 | `STYLESHEET` | 全部 CSS 规则（含 `@font-face` 与点阵字体规则） |
-| `readSettings` / `writeSettings` | `enabled` + `pixel`，存 `dsh.skin.win2003` |
+| `readSettings` / `writeSettings` | `enabled` + `pixel`，存 `dsh.skin.win2000` |
 | `project()` | 把设置投影到 DOM：`data-dsh-skin` / `-variant` / `-pixel` / `color-scheme` |
 | `PALETTES` | 配色列表（目前只有 Windows 2003 Luna；面板未消费，`variant` 也固定 `luna`） |
 | `MENUS` | 窗口示例的菜单栏数据 |
 | `SPEC` | **规范值常量表**，check 直接断言它 |
 | `ClassicWindow()` | 窗口示例组件（标题栏 + 三个标题按钮 + 菜单栏 + 客户区 + 状态栏 + 操作按钮） |
-| `UI_KEY` / `readUi` / `writeUi` | 面板位置与折叠态，存 `dsh.skin.win2003.ui` |
+| `UI_KEY` / `readUi` / `writeUi` | 面板位置与折叠态，存 `dsh.skin.win2000.ui` |
 | `SkinSettings()` | 右下角面板（标题栏可拖、可折叠、皮肤开关、点阵开关、窗口示例） |
 | `inject = ["slots"]` | **必须导出**，否则 fiber 早于 slot 服务激活 |
 | `apply(ctx)` | 注入 `<style>`、应用设置、注册面板 |
@@ -105,7 +105,7 @@ unsciiCJKV / unsciiCJKV18），其余走同名兜底。`client.js` 的 `@font-fa
 
 | 规则 | 作用 |
 |---|---|
-| `body[data-dsh-skin="win2003"]{…}` | 注入 WIN2003 token（`@@TOKENS@@` 槽位）+ 3D 阴影变量 + `font-size:11px` + `-webkit-font-smoothing:none` |
+| `body[data-dsh-skin="win2000"]{…}` | 注入 WIN2003 token（`@@TOKENS@@` 槽位）+ 3D 阴影变量 + `font-size:11px` + `-webkit-font-smoothing:none` |
 | `… :is(button,summary){box-shadow:var(--dsh-skin-shadow-raised)}` | 按钮凸起 |
 | `… :is(input,textarea,select,…){box-shadow:var(--dsh-skin-shadow-sunken)}` | 输入框凹陷 |
 | `… :is([role="dialog"],[role="alertdialog"]){…}` | 对话框凸起 |
@@ -125,8 +125,8 @@ unsciiCJKV / unsciiCJKV18），其余走同名兜底。`client.js` 的 `@font-fa
 
 | key | 内容 |
 |---|---|
-| `dsh.skin.win2003` | `{ enabled, pixel }`（`variant` 恒为 `luna`）。**两项都是默认值时不落盘**（`removeItem`），只有偏离默认才写。 |
-| `dsh.skin.win2003.ui` | `{ x, y, folded }`（面板位置与折叠，`x/y` 为 null 表示默认右下角） |
+| `dsh.skin.win2000` | `{ enabled, pixel }`（`variant` 恒为 `luna`）。**两项都是默认值时不落盘**（`removeItem`），只有偏离默认才写。 |
+| `dsh.skin.win2000.ui` | `{ x, y, folded }`（面板位置与折叠，`x/y` 为 null 表示默认右下角） |
 
 - **默认：皮肤开启 + 点阵字体开启**（localStorage 无记录 → `{enabled: true, pixel: true}`）。
 - **浮窗开关状态鲜明**：开启/选中的开关（「启用皮肤」、「点阵字体」）以**深海军蓝 `#0A246A` 高亮底色 + 反白文字 `#EDEDED` + 黑色对勾 ✔** 呈现，关闭项恢复平色灰底与空白框。
@@ -152,7 +152,7 @@ unsciiCJKV / unsciiCJKV18），其余走同名兜底。`client.js` 的 `@font-fa
 | 8 | 工具调用行被套上假边框 | 凸起规则命中了 `[role="button"]`，而聊天里的工具行/思考行都是 `role=button` 的 div | 凸起只给原生 `<button>`/`<summary>` 与 `[role=dialog]` |
 | 9 | 面板开关看不出开/关 | 按钮基础样式带 `!important` 压过按下态，且没有高亮条和勾选状态 | 选中的开关赋予 `background: #0A246A !important; color: #EDEDED !important;` 深蓝高亮与黑色对勾 ✔ |
 | 10 | 已编辑文件卡片头部深灰黑底太黑 | `--changes-fill` 与 `[class*="_header"]` 继承深色底色 | 覆盖 `:is([class*="_card"],[class*="Card"])` 的 `--changes-fill:#D4D0C8 !important` 与 `_header` 背景为 `#D4D0C8` + 纯黑文字 |
-| 11 | 点阵字体未命中 | CSS 字体族未包含本地安装的原版字体 | 字体族按「本地名 + `@font-face` `local()`」逐个列出；宿主半加 `/api/dsh-skin-win2003/fonts/` 做 HTTP 兜底（见第 2 节） |
+| 11 | 点阵字体未命中 | CSS 字体族未包含本地安装的原版字体 | 字体族按「本地名 + `@font-face` `local()`」逐个列出；宿主半加 `/api/dsh-skin-win2000/fonts/` 做 HTTP 兜底（见第 2 节） |
 | 12 | 代码字体下拉 17 个选项，选择困难，且与主字体互相打架 | 同一个下拉既驱动代码字体，又被 `project()` 反投影到 `data-dsh-skin-pixel` 去改主字体，两个轴耦合在一起 | **取消该下拉**，代码字体跟随主字体。`data-dsh-skin-mono`、`MONO_FONTS`、`settings.mono`/`customMono`、`--dsh-custom-mono` 及 17 条 `[data-dsh-skin-mono=…]` 规则一并删除；`check.mjs` 加断言守着"不许再加回来" |
 | 13 | 加粗的字边缘发虚、看着糊 | `unsciiCJKV18.otf` 只有 normal 一个字重，`<strong>`/`<b>` 仍带 `font-weight:bold`（它们不在主字体规则的选择器白名单里），浏览器于是**合成粗体**——对轮廓描边，点阵字形一描边就糊成灰边 | 主字体规则加 `font-synthesis:none !important`（该属性可继承，写在 `body[...]` 上即让所有后代免疫合成）；粗体改用点阵字体本来的做法——**1px 整数位移叠印** `text-shadow:1px 0 0 currentColor !important`，清晰且仍比正文重 |
 | 14 | 英文加粗糊，中文正常 | 拉丁字形在 16px 下 advance 只有 8px、墨迹 7px、笔画约 1px 宽，抗锯齿灰边在这么细的笔画上占比过大；中文笔画 2–3px，同样幅度看不出来 | **疑似真因见坑 15**（已改 `text-rendering:optimizeSpeed`，观感是否改善待人工复核）。**另有一条死路已试过并回退**：借系统等宽真粗体（`@font-face` + `unicode-range` 把拉丁截给 Consolas Bold）——Consolas advance ≈ 8.8px 对点阵的 8px，等宽布局逐字漂移约 10%，一行英文就歪出十几像素。结论：**任何用在这里的粗体面，advance 必须严格等于 8px**，字体风格其次 |
@@ -163,7 +163,7 @@ unsciiCJKV / unsciiCJKV18），其余走同名兜底。`client.js` 的 `@font-fa
 ## 8. 验证
 
 ```powershell
-cd D:\Desktop\fuck\DSH\dsh-skin-win2003
+cd D:\Desktop\fuck\DSH\dsh-skin-win2000
 node --check client.js        # 语法
 node check.mjs                # 250 tokens / 规范值 / 字体约定 / 投影 / 面板与窗口交互 / dispose
 node verify-metrics.mjs       # 对照 Win2003 度量表，纯白必须为 0
@@ -175,7 +175,7 @@ node verify-metrics.mjs       # 对照 Win2003 度量表，纯白必须为 0
 
 ```powershell
 # 列出运行清单里的皮肤行与 rev
-curl.exe -g -s "http://127.0.0.1:3080/" | Select-String "dsh-skin-win2003"
+curl.exe -g -s "http://127.0.0.1:3080/" | Select-String "dsh-skin-win2000"
 ```
 
 ---

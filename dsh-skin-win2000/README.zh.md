@@ -1,6 +1,6 @@
 <div align="center">
 
-# dsh-skin-win2003
+# dsh-skin-win2000
 
 **给 DeepSeek Harness Web GUI 换上一身 Windows Server 2003 的皮。**
 
@@ -53,23 +53,51 @@
 
 ## 安装
 
-皮肤以插件包形式挂进 DSH 的 profile：
+皮肤是一个标准的 DSH 组合包（bundle）：包里有 `dsh.bundle.patch` 指向 `cordis.patch.yml`，有 `dsh.client` 声明浏览器半侧。DSH 的插件管理器接受**包名、Git 地址、压缩包或本地路径**四种来源，所以下面三种装法任选。
+
+**方式一：Git 仓库（无需 npm 账号）**
 
 ```bash
-# 1. 把包放到你的 profile 依赖里（link 或 npm 均可）
-dsh plugin --profile web add link:/path/to/dsh-skin-win2003
-
-# 2. 在 profile 的 cordis.patch.yml 里插入一行
-#    （如果插件的 cordis.patch.yml 已被 bundle 层引用，这步可省略）
+dsh plugin --profile web add github:<你的账号>/dsh-skin-win2000
 ```
+
+仓库需要是公开的，且**仓库根就是包本体**（根目录下能读到 `package.json` 里的 `dsh.bundle.patch`）。
+
+**方式二：npm 包（市场可索引）**
+
+```bash
+# 发布方
+npm publish
+
+# 使用方
+dsh plugin --profile web add dsh-skin-win2000
+```
+
+**方式三：本地路径（开发用）**
+
+```bash
+dsh plugin --profile web add link:/path/to/dsh-skin-win2000
+```
+
+### 装完还要做一步
+
+如果包**不是**作为 bundle 层被自动加载（例如用了 `link:` 或手动拷贝），需要在你 profile 的 `cordis.patch.yml` 里插入一行：
 
 ```yaml
 - insert:
-    - id: skin-win2003
-      name: dsh-skin-win2003
+    - id: skin-win2000
+      name: dsh-skin-win2000
 ```
 
+图形界面里也可以走「侧栏 → 插件 → 添加插件」，把上面的包名或 Git 地址填进去，装完点**立即启用**。
+
 刷新页面即可。**如果界面没变化，请 `Ctrl+Shift+R` 强制刷新** —— 客户端 bundle 带一年强缓存，普通刷新拿不到新版本。
+
+### 关于字体
+
+皮肤**不设置任何字体**（唯一例外是窗口标题按钮的 Marlett 符号字形）。字号只有度量表要求的 `font-size: 11px` 这一条，而你在 DSH 设置里选的字号是内联样式，优先级更高——**你的字体设置永远赢**。
+
+所以换到别人机器上，字体观感就是你自己的设置：用系统字体、用等宽字体、用点阵字体都成立，皮肤的立体边、直角、配色与字体无关。
 
 ## 使用
 
@@ -117,12 +145,12 @@ node verify-metrics.mjs  # 对照 Windows Server 2003 度量表，纯白必须�
 - **11px 是全局字号** —— 这是度量表的一部分，正文与代码块一起降到 11px。
 - **`-webkit-font-smoothing: none` 在 Windows 的 Chromium 上不生效**，写了但改变不了渲染。
 - **直角是通杀的** —— 头像、状态圆点、开关滑块都会变方。需要保留圆形的话，从 `border-radius:0 !important` 的选择器里排除即可。
-- **截图是实拍** —— 仓库里的三张 PNG 由 `tools/capture.mjs` 通过 Chrome DevTools Protocol 抓取运行中的界面，皮肤状态为 `data-dsh-skin="win2003"`。抓图环境使用你本机的点阵字体与配色设置，所以字体观感会与你的设置一致。
+- **截图是实拍** —— 仓库里的三张 PNG 由 `tools/capture.mjs` 通过 Chrome DevTools Protocol 抓取运行中的界面，皮肤状态为 `data-dsh-skin="win2000"`。抓图环境使用你本机的点阵字体与配色设置，所以字体观感会与你的设置一致。
 
 ## 开发
 
 ```
-dsh-skin-win2003/
+dsh-skin-win2000/
 ├── client.js             全部实现（单文件，零构建）
 ├── index.js              宿主半占位（export function apply() {}）
 ├── package.json          插件清单：exports / dsh.bundle / dsh.client

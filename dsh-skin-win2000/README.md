@@ -1,6 +1,6 @@
 <div align="center">
 
-# dsh-skin-win2003
+# dsh-skin-win2000
 
 **Windows Server 2003 for the DeepSeek Harness Web GUI.**
 
@@ -53,23 +53,51 @@ It does not approximate the era — it takes its values from the era's metric ta
 
 ## Install
 
-The skin installs as a plugin package in your DSH profile:
+The skin is a standard DSH bundle: the package declares `dsh.bundle.patch` pointing at `cordis.patch.yml`, and `dsh.client` for its browser half. The plugin manager accepts a package name, a Git address, an archive or a local path, so any of the three routes below works.
+
+**Route 1 — Git repository (no npm account needed)**
 
 ```bash
-# 1. Add the package to your profile (link or npm both work)
-dsh plugin --profile web add link:/path/to/dsh-skin-win2003
-
-# 2. Insert one row into the profile's cordis.patch.yml
-#    (skip this when the package's own cordis.patch.yml is already picked up as a bundle layer)
+dsh plugin --profile web add github:<your-account>/dsh-skin-win2000
 ```
+
+The repository must be public, and **the repository root must be the package** (its `package.json` has to carry `dsh.bundle.patch`).
+
+**Route 2 — npm package (indexable by the market)**
+
+```bash
+# publisher
+npm publish
+
+# user
+dsh plugin --profile web add dsh-skin-win2000
+```
+
+**Route 3 — local path (for development)**
+
+```bash
+dsh plugin --profile web add link:/path/to/dsh-skin-win2000
+```
+
+### One more step after installing
+
+When the package is not picked up automatically as a bundle layer (a `link:` install, or a manual copy), insert one row into your profile's `cordis.patch.yml`:
 
 ```yaml
 - insert:
-    - id: skin-win2003
-      name: dsh-skin-win2003
+    - id: skin-win2000
+      name: dsh-skin-win2000
 ```
 
+In the GUI you can also use **Sidebar → Plugins → Add plugin**, paste the package name or Git address, and press **Enable now** when it finishes.
+
 Reload the page. **If nothing changes, force a reload with `Ctrl+Shift+R`** — client bundles are served with a one-year immutable cache, so an ordinary reload keeps the old JavaScript.
+
+### About fonts
+
+The skin **sets no font** (the only exception is the Marlett symbol glyphs in the window title buttons). The single type rule it carries is the metric table's `font-size: 11px`, and the size you pick in DSH settings is written as an inline style with higher precedence — **your font settings always win**.
+
+So on someone else's machine the type rendering is whatever they configured: system fonts, monospace, or a bitmap font all work, because the bevels, square corners and colours are independent of the typeface.
 
 ## Using it
 
@@ -117,12 +145,12 @@ node verify-metrics.mjs  # the Windows Server 2003 metric table; pure white must
 - **11px is global** — it is part of the metric table, so body text and code blocks drop to 11px along with the controls.
 - **`-webkit-font-smoothing: none` does nothing on Windows Chromium** (it renders through DirectWrite). It is declared, but it cannot change the rendering there.
 - **Square corners are indiscriminate** — avatars, status dots and switch knobs all become squares. To keep circles, exclude them from the `border-radius:0 !important` selector.
-- **The screenshots are captures** — the three PNGs are taken from a running interface by `tools/capture.mjs` over the Chrome DevTools Protocol, with the skin mounted (`data-dsh-skin="win2003"`). The capture machine uses this author's bitmap-font and palette settings, so type rendering follows those settings.
+- **The screenshots are captures** — the three PNGs are taken from a running interface by `tools/capture.mjs` over the Chrome DevTools Protocol, with the skin mounted (`data-dsh-skin="win2000"`). The capture machine uses this author's bitmap-font and palette settings, so type rendering follows those settings.
 
 ## Development
 
 ```
-dsh-skin-win2003/
+dsh-skin-win2000/
 ├── client.js             the whole implementation (one file, no build)
 ├── index.js              host half placeholder (export function apply() {})
 ├── package.json          manifest: exports / dsh.bundle / dsh.client
