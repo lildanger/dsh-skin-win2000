@@ -6,6 +6,7 @@
 
 Classic grey controls, two-tone gradient title bars, 1px bevels, hard square corners, a 16px scrollbar.
 
+[![npm version](https://img.shields.io/npm/v/dsh-skin-win2000?style=flat-square&color=CB3837&label=npm)](https://www.npmjs.com/package/dsh-skin-win2000)
 [![DSH plugin](https://img.shields.io/badge/DSH-client--plugin-0A246A?style=flat-square)](#install)
 [![platform](https://img.shields.io/badge/platform-web%20GUI-316AC5?style=flat-square)](#install)
 [![no build](https://img.shields.io/badge/build-none-D4D0C8?style=flat-square)](#development)
@@ -55,23 +56,21 @@ It does not approximate the era — it takes its values from the era's metric ta
 
 The skin is a standard DSH bundle: the package declares `dsh.bundle.patch` pointing at `cordis.patch.yml`, and `dsh.client` for its browser half. The plugin manager accepts a package name, a Git address, an archive or a local path, so any of the three routes below works.
 
-**Route 1 — Git repository (no npm account needed)**
+**Route 1 — npm package (recommended; the plugin market indexes it)**
+
+```bash
+dsh plugin --profile web add dsh-skin-win2000
+```
+
+Package page: <https://www.npmjs.com/package/dsh-skin-win2000>
+
+**Route 2 — Git repository (no npm account needed)**
 
 ```bash
 dsh plugin --profile web add github:lildanger/dsh-skin-win2000
 ```
 
 The repository must be public, and **the repository root must be the package** (its `package.json` has to carry `dsh.bundle.patch`).
-
-**Route 2 — npm package (indexable by the market)**
-
-```bash
-# publisher
-npm publish
-
-# user
-dsh plugin --profile web add dsh-skin-win2000
-```
 
 **Route 3 — local path (for development)**
 

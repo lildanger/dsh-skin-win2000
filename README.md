@@ -6,6 +6,7 @@
 
 经典中性灰控件、双色渐变标题栏、1px 立体浮雕、绝对直角、16px 经典滚动条。
 
+[![npm version](https://img.shields.io/npm/v/dsh-skin-win2000?style=flat-square&color=CB3837&label=npm)](https://www.npmjs.com/package/dsh-skin-win2000)
 [![DSH plugin](https://img.shields.io/badge/DSH-client--plugin-0A246A?style=flat-square)](#安装)
 [![platform](https://img.shields.io/badge/platform-web%20GUI-316AC5?style=flat-square)](#安装)
 [![no build](https://img.shields.io/badge/build-none-D4D0C8?style=flat-square)](#开发)
@@ -55,23 +56,21 @@
 
 皮肤是一个标准的 DSH 组合包（bundle）：包里有 `dsh.bundle.patch` 指向 `cordis.patch.yml`，有 `dsh.client` 声明浏览器半侧。DSH 的插件管理器接受**包名、Git 地址、压缩包或本地路径**四种来源，所以下面三种装法任选。
 
-**方式一：Git 仓库（无需 npm 账号）**
+**方式一：npm 包（推荐，插件市场可搜到）**
+
+```bash
+dsh plugin --profile web add dsh-skin-win2000
+```
+
+包地址：<https://www.npmjs.com/package/dsh-skin-win2000>
+
+**方式二：Git 仓库（无需 npm 账号）**
 
 ```bash
 dsh plugin --profile web add github:lildanger/dsh-skin-win2000
 ```
 
 仓库需要是公开的，且**仓库根就是包本体**（根目录下能读到 `package.json` 里的 `dsh.bundle.patch`）。
-
-**方式二：npm 包（市场可索引）**
-
-```bash
-# 发布方
-npm publish
-
-# 使用方
-dsh plugin --profile web add dsh-skin-win2000
-```
 
 **方式三：本地路径（开发用）**
 
