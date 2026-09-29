@@ -100,7 +100,7 @@ The skin **ships the bitmap face it renders with**: `fonts/unsciiCJKV18.otf` (6.
 - The `@font-face` declares **no `local()` source**, so a copy installed on the machine can never take precedence — every installation renders identically
 - Only that one family is declared, and the stack is `"unsciiCJKV18", monospace`; no family this package does not carry is named
 - The response carries `cache-control: public, max-age=604800, immutable`, so a browser fetches it at most once a week, and `font-display: swap` keeps text visible until it lands
-- Licence status is in [fonts/README.md](fonts/README.md): the face's redistribution terms are **documented nowhere**, and upstream `viznut/unscii` declares no licence either. That file also says how to replace or remove it
+- Licence: unscii itself is **public domain** — Viznut's own page says so ("the other variants are in the Public Domain", with only `unscii-16-full` under GPL because of Unifont) — and this face is a CJK extension of it, which a public-domain work permits. Full notes in [fonts/README.md](fonts/README.md)
 
 The rest of the skin **sets no font** (the only exception is the Marlett symbol glyphs in the window title buttons). Switch the panel's pixel-font toggle off and the interface uses your own font settings entirely.
 

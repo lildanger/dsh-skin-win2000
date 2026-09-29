@@ -21,22 +21,26 @@ stylesheet requests.
 immutable`, so a browser downloads it once per week at most, and `font-display: swap`
 keeps text visible while it arrives.
 
-## Licence status — read before redistributing
+## Licence
 
 The face is a CJK extension of **unscii**, the bitmap font family by Viznut.
-Two facts matter here:
+unscii is public domain, and Viznut's own page states it plainly:
 
-- The upstream `viznut/unscii` repository declares **no licence** in its GitHub
-  metadata, and this file's own `name` table carries **no Copyright, License or
-  License URL record**.
-- This particular `unsciiCJKV18` build is a derivative with CJK coverage; a search
-  for its origin returns no upstream project or stated terms.
+> "unscii-16-full" falls under GPL because of how Unifont is licensed; **the other
+> variants are in the Public Domain.** Unscii was created by Viznut.
+> — <http://viznut.fi/unscii/>
 
-In other words: **the redistribution terms are not documented anywhere we could
-find.** unscii is widely treated as public domain by its users, and this package
-follows that reading, but that is a reading, not a licence grant.
+A public-domain work may be used, modified and redistributed without permission, so
+this package redistributes the face on that basis. The Latin, symbol and box-drawing
+glyphs come from that public-domain family; the CJK coverage is the extension layer
+added on top of it.
 
-If you are the rights holder and want this file removed, open an issue on
+One caveat worth recording, because it is the only loose end: the download list on
+Viznut's page covers `unscii-8`, `unscii-16` and their style variants, and publishes
+no `unsciiCJK` build itself — the CJK layer was added by someone else, and that
+layer's own terms are not stated anywhere we could find. It carries no Copyright,
+License or License URL record in its `name` table either. If you are the author of
+that layer and want it handled differently, open an issue on
 <https://github.com/lildanger/dsh-skin-win2000/issues> and it will be dropped from
 the package — the skin still works, it just falls back to whatever the machine has.
 

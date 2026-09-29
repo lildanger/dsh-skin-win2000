@@ -100,7 +100,7 @@ dsh plugin --profile web add link:/path/to/dsh-skin-win2000
 - `@font-face` **不写 `local()`**，所以机器上装了什么字体都不会抢先——每台机器渲染结果一致
 - 只声明这一个字体族，字体栈为 `"unsciiCJKV18", monospace`，不再引用包里没有的字体
 - 响应带 `cache-control: public, max-age=604800, immutable`，浏览器每周最多下载一次；`font-display: swap` 保证字体到达前文字可见
-- 字体许可状态见 [fonts/README.md](fonts/README.md)：该字体的再分发条款**没有任何地方写明**，上游 `viznut/unscii` 也未声明许可证。如需替换或移除，该文件里写了做法
+- 字体许可：unscii 本体是 **Public Domain**（Viznut 官方页面写明「除 unscii-16-full 因 Unifont 而受 GPL 约束外，其余变体均属公有领域」），本字体是它的 CJK 扩展衍生版 —— 公有领域的作品可以自由修改与再分发。完整说明见 [fonts/README.md](fonts/README.md)
 
 皮肤其余部分**不设置字体**：唯一例外是窗口标题按钮的 Marlett 符号字形。如果你关掉面板里的「点阵字体」开关，界面就完全用你自己的字体设置。
 
