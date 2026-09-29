@@ -249,6 +249,15 @@ npm publish
 npm view dsh-skin-win2000@<新版本> version
 ```
 
+### 文档也算发布内容
+
+`HANDOFF.md` 已在 `package.json` 的 `files` 里，**随包发布** —— 否则一次纯文档改动会发出版本号不同、内容却逐字节相同的 tarball。
+
+由此推出两条操作口径：
+
+- **代码、样式、字体、包结构、README 的任何变化 → 必须发版**（patch 起）。
+- **同一轮工作里的文档措辞微调 → 并进下一次发版**，不单独占一个版本号。
+
 ### 发布相关的既知事实
 
 - **认证**：本机 `~/.npmrc` 里有带 **Bypass 2FA** 的 granular access token（90 天有效），所以 `npm publish` **不需要动态码**。token **不要发给任何人**，也不要贴进对话。
