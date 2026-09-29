@@ -158,17 +158,24 @@ node verify-metrics.mjs  # the Windows 2000 metric table; pure white must be 0
 ```
 dsh-skin-win2000/            ← the repository root IS the package
 ├── client.js                the whole implementation (one file, no build)
-├── index.js                 host half placeholder (export function apply() {})
-├── package.json             manifest: exports / dsh.bundle / dsh.client
+├── index.js                 host half: webServer route serving the bundled font
+├── package.json             manifest + npm metadata (the version lives here)
 ├── cordis.patch.yml         bundle-layer patch
-├── check.mjs                minimal runnable check
+├── check.mjs                client check (stubbed)
+├── check-host.mjs           host font-route check
 ├── verify-metrics.mjs       colour regression against the metric table
 ├── tools/capture.mjs        captures the README images over CDP
-├── fonts/unsciiCJKV18.woff2   the bundled bitmap face (1.42 MB, WOFF2)
-├── fonts/COPYING              the GPL text (the face derives from unscii-16-full)
+├── tools/probe-live-css.mjs reads the injected stylesheet in a browser
+├── tools/probe-diff-palette.mjs  measures the diff colours
+├── tools/inspect-highlight.mjs   measures text and icon colours inside a selection
+├── tools/font-license.mjs   reads the licence fields out of a font's name table
+├── fonts/unsciiCJKV18.woff2 the bundled bitmap face (1.42 MB, WOFF2)
+├── fonts/README.md          the face's provenance, format and GPL notes
+├── fonts/COPYING            the GPL text
 ├── docs/screenshots/        the three captured PNGs
-├── HANDOFF.md               handoff notes: structure, line numbers, pitfalls
 ├── README.md                the Chinese introduction (the default)
+├── HANDOFF.md               handoff notes: structure, pitfalls, release rules
+├── LICENSE                  MIT (the skin itself)
 └── workspace/               local scripts and lockfiles (not published)
 ```
 

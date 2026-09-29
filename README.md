@@ -135,14 +135,18 @@ dsh plugin --profile web add link:/path/to/dsh-skin-win2000
 
 ## 验证
 
-仓库自带两个可执行检查，不需要浏览器：
-
 ```bash
-node check.mjs           # 规范值、样式表、面板与窗口交互、dispose 清理
-node verify-metrics.mjs  # 对照 Windows 2000 度量表，纯白必须为 0
+node --check client.js              # 语法
+node check.mjs                      # 客户端规范与交互（桩件驱动，不需要浏览器）
+node check-host.mjs                 # 宿主字体路由：供包内字体 / 404 未知 / 拒绝路径穿越
+node verify-metrics.mjs             # 对照度量表，纯白必须为 0
+node tools/probe-live-css.mjs       # 在浏览器里核对注入后的样式表（需要 DSH 在跑）
+node tools/probe-diff-palette.mjs   # 实测 diff 的字色与底色（需要 DSH 在跑）
 ```
 
-`check.mjs` 用桩件（module loader / React / DOM）把插件跑一遍，覆盖：SPEC 常量逐值、三态立体阴影、标题栏双向渐变、11px 字号、无字体接管、radius 全归零、滚动条直角、面板与窗口规则、气泡配色、投影三属性、面板折叠与开关、窗口示例的标题栏/菜单/状态栏/操作按钮，以及卸载后的清理。
+`check.mjs` 用桩件（module loader / React / DOM）驱动插件，覆盖：SPEC 常量逐值、三态立体阴影、标题栏双向渐变、11px、无纯白、radius 全归零、滚动条、面板与窗口规则、气泡、侧栏凹槽、定位标记排除、链接色、**面板三档循环**（含「拖动后的 click 不换档」的真实指针流程）、窗口示例交互、dispose 清理。
+
+**为什么后两条需要浏览器**：客户端 bundle 发给浏览器的是**源码文本**，token 拼接与样式注入都在浏览器里发生 —— 拿 grep 去搜 bundle 永远搜不到结果（见 HANDOFF 的坑 17）。`probe-live-css.mjs` 会逐条比对 199 个带色值的 token，是唯一能证明它们真正生效的办法。
 
 ## 已知限制
 
@@ -158,17 +162,24 @@ node verify-metrics.mjs  # 对照 Windows 2000 度量表，纯白必须为 0
 ```
 dsh-skin-win2000/            ← 仓库根就是包本体
 ├── client.js                全部实现（单文件，零构建）
-├── index.js                 宿主半占位（export function apply() {}）
-├── package.json             插件清单：exports / dsh.bundle / dsh.client
+├── index.js                 宿主半：webServer 路由，从包内提供字体
+├── package.json             插件清单 + npm 元数据（版本号在这里改）
 ├── cordis.patch.yml         bundle 层补丁
-├── check.mjs                最小可运行检查
+├── check.mjs                客户端检查（桩件驱动）
+├── check-host.mjs           宿主字体路由检查
 ├── verify-metrics.mjs       度量表配色回归
-├── tools/capture.mjs        通过 CDP 抓取运行中界面的真实截图
-├── fonts/unsciiCJKV18.woff2   随包分发的点阵字体（1.42 MB，WOFF2）
-├── fonts/COPYING              GPL 许可全文（字体衍生自 unscii-16-full）
-├── docs/screenshots/        README 用的三张实拍 PNG
-├── HANDOFF.md               交接文档：结构、行号、踩坑记录
+├── tools/capture.mjs        用 CDP 抓运行中界面的真实截图
+├── tools/probe-live-css.mjs 在浏览器里核对注入后的样式表
+├── tools/probe-diff-palette.mjs  实测 diff 的字色与底色
+├── tools/inspect-highlight.mjs   实测深蓝高亮里的文字与图标颜色
+├── tools/font-license.mjs   读字体 name 表的许可字段
+├── fonts/unsciiCJKV18.woff2 随包分发的点阵字体（1.42 MB，WOFF2）
+├── fonts/README.md          字体的来源、格式与 GPL 说明
+├── fonts/COPYING            GPL 许可全文
+├── docs/screenshots/        三张实拍截图
 ├── README.en.md             英文版说明
+├── HANDOFF.md               交接文档：结构、踩坑、发布规则
+├── LICENSE                  MIT（皮肤本体）
 └── workspace/               本地脚本与锁文件（不随包发布）
 ```
 

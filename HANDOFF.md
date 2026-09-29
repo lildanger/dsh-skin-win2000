@@ -37,12 +37,17 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 ├── check-host.mjs        宿主半检查（直接驱动路由 handler）
 ├── verify-metrics.mjs    对照度量表的配色回归
 ├── fonts/
-│   ├── unsciiCJKV18.otf  随包分发的点阵字体（6.37 MB，许可见该目录 README）
-│   └── README.md         来源、许可、移除方法
+│   ├── unsciiCJKV18.woff2 随包分发的点阵字体（1.42 MB，许可见该目录 README）
+│   ├── COPYING            GPL 全文（字体衍生自 unscii-16-full）
+│   └── README.md          来源、许可、格式与移除方法
 ├── docs/screenshots/     三张实机截图（tools/capture.mjs 生成）
 ├── tools/
 │   ├── capture.mjs       用 CDP 抓真实界面截图
-│   ├── probe-live-css.mjs 在浏览器里核对注入后的样式表
+│   ├── probe-live-css.mjs 核对注入后的样式表（199 个带色值 token）
+│   ├── probe-diff-palette.mjs 实测 diff 行/行号列/符号/计数的颜色
+│   ├── probe-font-state.mjs   document.fonts 状态与字体请求
+│   ├── probe-woff2-decisive.mjs 注入单一来源字体，判定 woff2 能否被加载
+│   ├── inspect-highlight.mjs  打开命令菜单，报告深蓝高亮里的文字与图标颜色
 │   └── font-license.mjs  读字体 name 表的许可字段
 ├── README.md             中文说明（GitHub 默认显示）
 ├── README.en.md          英文说明
@@ -51,7 +56,7 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 └── workspace/            本地脚本与锁文件（已 gitignore，不随包发布）
 ```
 
-**字体服务**（`index.js`）：`ctx.webServer.register({kind:"prefix", path:"/api/dsh-skin-win2000/fonts"})`
+**字体服务**（`index.js`）：`ctx.webServer.register({kind:"prefix", path:"/api/dsh-skin-win2000/fonts"})`，`content-type` 按扩展名给（`.woff2` → `font/woff2`）
 **路径不带尾斜杠**——服务器的匹配规则是 `pathname === prefix || pathname.startsWith(prefix + "/")`，
 存了尾斜杠就要求请求里出现双斜杠，永远匹配不上（详见第 7 节坑 16）。
 解析顺序：**包内 `fonts/` 优先**，作者本机字体目录仅作开发兜底。
@@ -189,6 +194,15 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 | 21 | 每个定位标记都套着框 | 标记是 `<button>`，被"所有按钮凸起"的规则命中；DSH 原本画的是无边框标记 | `nav[aria-label] button[data-index]` 排除，且特异性要高于按下态规则 |
 | 22 | **改错了元素** | 报告说"侧边栏"，我改了**聊天区**的 `[data-width-handle]` | 先用像素/DOM 证据定位到具体元素（`_sidebarCol` / `_handle` 各自全局唯一），再改 |
 | 23 | 脚本 anchor 匹配不上 | 工作区文件是 **CRLF**，而脚本里的锚点用 LF | 脚本读入后 `.replace(/\r\n/g, "\n")`，写回统一 LF |
+| 25 | **字体路由返回 200，浏览器却不用它** | 宿主端 MIME 写死成 `font/ttf`（旧代码只认 `.otf`）。Chromium 对同源字体不严格校验，Firefox/Safari 会拒绝 | `index.js` 按扩展名给 MIME；改完**必须重启**宿主端才生效（进程启动早于改动就还是旧代码，用 `Get-NetTCPConnection -LocalPort 3080` 对比进程启动时间与文件修改时间） |
+| 26 | **`local()` 让验证结论失效** | `@font-face` 里 `url()` 后面跟着 `local()`，任一成功都会让 `document.fonts` 状态为 `loaded`，无法区分来源 | 注入一个**只有 `url()`** 的同名字体再测（`tools/probe-woff2-decisive.mjs`）——headless 里 `local()` 取不到系统字体，于是结果无歧义 |
+| 27 | **断言写在函数定义之前** | `const specificity` 定义在第 200 行，断言在第 194 行 → TDZ 报 `Cannot access before initialization`，症状像测试失败，其实是求值顺序错误 | 辅助函数统一提到 `assert` 之后（文件顶部），一处定义全文可用。**已踩两次** |
+| 28 | **断言用正则手写转义** | 转义了 `]` 却漏了 `)`，正则非法 → `SyntaxError: Unmatched ')'` | 能用 `css.includes('…')` 就别用正则；必须用正则时整段复制实际文本 |
+| 29 | **多行规则的字符串匹配** | 规则跨三行，`includes(单行拼接)` 必然失败 | 分段匹配（首行末尾的逗号 + 声明体），或改用 `indexOf` 比较顺序 |
+| 30 | **一条规则抢走另一条的语义色** | 卡片黑字规则 `:is(卡片) :is(span,…)` 特异性 (0,5,2)，压过 `_added`/`_deleted`/`_sign` 的语义色 | 给强规则加 `:not(…)` 排除；深蓝选中态另加一条**全局兜底**（重复属性选择器抬特异性 + 放在样式表末尾，靠顺序也赢） |
+| 31 | **杀进程范围过大，关掉用户浏览器** | `Get-Process chrome \| Stop-Process` 按进程名杀，把用户正在用的窗口一起杀了 | 只按命令行特征筛自己启动的实例：`Get-CimInstance Win32_Process -Filter "Name='chrome.exe'"` 再 `Where-Object { $_.CommandLine -like '*dsh-*-profile*' }`；脚本内的 `chrome.kill()` 本就只杀自己那个 |
+| 32 | **JS 双引号串里写半角引号** | `（含"xxx"的…）` 里的半角引号提前终止字符串 → `SyntaxError: Unexpected identifier`。**已踩两次** | 中文引号用「」或全角；或改用单引号/模板字符串 |
+| 33 | `git add -A` 把提交消息文件卷进仓库 | 消息写在仓库内的临时 `.txt`，`add -A` 一并暂存。**已踩两次** | 消息文件写进 `$env:TEMP`，或把文件名加进 `.gitignore` |
 | 24 | PowerShell 吃掉/误解脚本内容 | here-string 里的反引号、引号、`!` 会被解析 | **用 `write` 工具写脚本文件**，再 `node 脚本` 执行；提交消息用 `git commit -F 文件` |
 
 ---
@@ -249,6 +263,14 @@ npm publish
 npm view dsh-skin-win2000@<新版本> version
 ```
 
+### 包里带什么
+
+`package.json` 的 `files` **逐项列出**字体文件（`fonts/unsciiCJKV18.woff2`、`fonts/README.md`、`fonts/COPYING`），而不是整个 `fonts` 目录 —— 否则转换用的源文件会跟着进包（`.gitignore` 管不住 npm 的 `files`）。发版前用 `npm publish --dry-run` 核对清单。
+
+### 字体的许可义务
+
+随包分发的字体是 **GPL**（衍生自 `unscii-16-full`，该变体因 Unifont 而受 GPL 约束），**不是公有领域**。再分发时必须带 `fonts/COPYING`，并注明 CJK 层是对 `unscii-16-full` 的修改。皮肤本体仍是 MIT —— 字体是被样式表按 URL 引用的数据，不是链接进插件的代码。
+
 ### 文档也算发布内容
 
 `HANDOFF.md` 已在 `package.json` 的 `files` 里，**随包发布** —— 否则一次纯文档改动会发出版本号不同、内容却逐字节相同的 tarball。
@@ -281,7 +303,8 @@ npm view dsh-skin-win2000@<新版本> version
 5. **字体由皮肤接管**：点阵开关打开时（默认）`unsciiCJKV18` 覆盖全局字体并把字号抬到 16px；关掉才回到用户字体。
 6. **直角是通杀的**：头像、状态圆点、开关滑块都会变方。
 7. **粗体只能靠叠印**：字体只有一个字重，必须配合 `optimizeSpeed` 才实心。若真需要 Bold 字重，得给字体造一个（advance 必须逐字等于 8px）。
-8. **截图是实拍但环境是你本机**：`docs/screenshots/` 由 `tools/capture.mjs` 抓取，用的是你的点阵字体与配色设置，所以**字体观感与你一致、与别人可能不同**。
+8. **宿主端 MIME 需要重启才对**：`index.js` 的改动只有重启 DSH 才生效（进程内仍是旧代码）。旧版只认 `.otf`，其余一律 `font/ttf` —— Chromium 容忍，Safari/Firefox 可能拒绝。判断方法：`Get-NetTCPConnection -LocalPort 3080` 拿进程启动时间，与 `index.js` 的修改时间对比。
+9. **截图是实拍但环境是你本机**：`docs/screenshots/` 由 `tools/capture.mjs` 抓取，用的是你的点阵字体与配色设置，所以**字体观感与你一致、与别人可能不同**。
 
 ---
 
@@ -291,5 +314,5 @@ npm view dsh-skin-win2000@<新版本> version
 - **面板"重置位置"入口**：现在只能拖 + 双击归位。
 - **若 DSH 给第三方主题开放「外观」入口**：可以改回 `ctx.theme.register()` 走官方路径。
 - **死代码**：`PALETTES` 与 `settings.variant` 只列 luna 一项且面板未消费，可清理。
-- **字体子集化**：`unsciiCJKV18.otf` 6.37 MB，若只保留常用字可大幅缩小（代价是生僻字回退，破坏"显示一致"的目标，故未做）。
+- **字体子集化**：`unsciiCJKV18.woff2` 1.42 MB（已由 6.37 MB 的 OTF 转换而来），若只保留常用字还能更小（代价是生僻字回退，破坏「显示一致」的目标，故未做）。
 - **粗体字重**：给 `unsciiCJKV18` 造一个 Bold（位图膨胀 1px → 轮廓化），能根治坑 13/14/15 的叠印方案。本机 `fontTools 4.63` 可用。
