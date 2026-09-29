@@ -1,6 +1,6 @@
 {
   "name": "dsh-skin-win2000",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Windows 2000 skin for the DSH Web GUI: metric-accurate grey chrome, two-tone gradient title bars, 1px bevels, square corners and a 16px scrollbar. 给 DSH Web GUI 换上 Windows 2000 经典外观。",
   "type": "module",
   "exports": {
