@@ -42,6 +42,14 @@ const stripComments = (text) => text
     .join("\n");
 
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
+
+const specificity = (selector) => {
+    const ids = (selector.match(/#[\w-]+/g) ?? []).length;
+    const rest = selector.replace(/#[\w-]+/g, "");
+    const classes = (rest.match(/\.[\w-]+|\[[^\]]+\]|:(?!:)[\w-]+/g) ?? []).length;
+    const types = (rest.replace(/\.[\w-]+|\[[^\]]+\]|::?[\w-]+(\([^)]*\))?/g, " ").match(/[a-zA-Z][\w-]*/g) ?? []).length;
+    return ids * 10000 + classes * 100 + types;
+};
 const equal = (actual, expected, what) => assert(actual === expected, `${what}\n  expected: ${expected}\n  actual:   ${actual}`);
 
 /**
@@ -170,13 +178,18 @@ assert(css.includes("::-webkit-scrollbar-thumb{background:#D4D0C8;background-cli
 assert(!/:where\([^)]*\)\{[^}]*border-radius/.test(css), "the square-corner rule may not use :where(), whose specificity is zero");
 assert(!/#(?:FFFFFF|ffffff)\b/.test(css), "no pure white may survive anywhere in the skin");
 assert(css.includes('font-family:"unsciiCJKV18",monospace'), "the bundled face must lead the type stack, with no unshipped family behind it");
-assert(css.includes('@font-face{font-family:"unsciiCJKV18";src:url("/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf") format("opentype")'), "the face must load from the package over the host route, not from a local install");
-assert(/src:url\("\/api\/dsh-skin-win2000\/fonts\/unsciiCJKV18\.otf"\) format\("opentype"\),local\("unsciiCJKV18"\)/.test(css), "the packaged face must come first in src, with a local() copy only behind it as a fallback");
+assert(css.includes('@font-face{font-family:"unsciiCJKV18";src:url("/api/dsh-skin-win2000/fonts/unsciiCJKV18.woff2") format("woff2")'), "the face must load from the package over the host route, not from a local install");
+assert(/src:url\("\/api\/dsh-skin-win2000\/fonts\/unsciiCJKV18\.woff2"\) format\("woff2"\),local\("unsciiCJKV18"\)/.test(css), "the packaged face must come first in src, with a local() copy only behind it as a fallback");
 assert(!/fonts\/(zpix|PixelCode|unscii-16-full)/.test(css), "no declaration may point at a font this package does not ship");
+assert(css.includes("unsciiCJKV18.woff2"), "the shipped face must be the woff2 build");
 assert(css.includes("font-synthesis:none !important"), "synthetic bold must stay off: the face carries one weight, and a synthesised stroke blurs the pixel grid");
 assert(css.includes("text-rendering:optimizeSpeed"), "the pixel face must snap glyphs to whole pixels: optimizeSpeed does, geometricPrecision explicitly does not");
 assert(!css.includes("geometricPrecision"), "geometricPrecision defeats the pixel grid and fringes every 1px stem");
 assert(css.includes(":is(strong,b){text-shadow:1px 0 0 currentColor"), "emphasis must be overprinted one pixel, not synthetically emboldened");
+// Everything inside a navy selection must be light, whatever tag it uses: a tag
+// whitelist left buttons and list items dark on navy.
+assert(css.includes('"_selected"]) *{color:#EDEDED !important}'), "the selection block must recolour every descendant, not a list of tags");
+assert(!css.includes("]) :is(span,div,p,a,time){color:#EDEDED"), "the tag whitelist must not come back");
 // 98.css defines exactly one link colour, --link-blue: #0000ff.
 assert(css.includes("--dsw-alias-link:#0000FF !important"), "prose links must use the 98.css link blue");
 assert(css.includes("--shiki-token-link:#0000FF !important"), "links inside code blocks must match");
@@ -185,20 +198,30 @@ assert(/\[class\*="_sidebarCol"\]\{border-right:0 !important;box-shadow:inset -1
 assert(/\[class\$="_handle"\]:hover\{background:#D4D0C8 !important/.test(css), "the sidebar width handle must show itself on hover");
 // The selected sidebar row paints its icons black; a light tint was tried and
 // rejected twice, so this pins the requested colour.
-assert(css.includes('_selected"]) svg{color:#000000 !important}'), "the selected row\u0027s icons must be black");
+assert(css.includes('_selected"]) svg,') && css.includes("svg *{color:#EDEDED !important}"), "the selected row\u0027s icons must be light, subtree included");
+// A popup's black-text rule outranks the light rule, so it must skip anything
+// inside a selection; otherwise selected rows in command menus stay black.
+assert(css.includes(":is(div,span,p,a,time,label,h1,h2,h3,h4):not([aria-selected=\"true\"] *)"), "the black-text rule must exclude descendants of a selection");
+// Diff counters must stay semantic: green additions, red deletions.
+assert(css.includes('[class*="_added"]{color:var(--dsw-alias-state-success-primary) !important}'), "additions must be green");
+assert(css.includes('[class*="_deleted"]{color:var(--dsw-alias-state-error-primary) !important}'), "deletions must be red");
+assert(css.includes(':not([class*="_added"]):not([class*="_deleted"]):not([class*="_sign"]){color:#000000 !important}'), "the card black-text rule must not claim the counters or the diff signs");assert(css.includes('[class*="_sign"]{color:var(--diff-marker,currentColor) !important}'), "diff signs must take their row\u0027s marker colour");
+// Diff tints must be visible on grey and belong to the same family as the text.
+assert(css.includes("--dsw-alias-file-diff-added-bg:#CCFFCC !important"), "added rows need a readable green tint");
+assert(css.includes("--dsw-alias-file-diff-deleted-bg:#FFCCCC !important"), "deleted rows need a readable red tint");
+assert(css.includes(':not([class*="_sign"]){color:#000000 !important}'), "the card black-text rule must not claim the diff signs");
+// A single backstop outranks every black-forcing rule inside a selection, so no
+// future rule can make a selected row unreadable by accident.
+const backstop = 'body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) *';
+assert(css.includes(backstop + ",") && css.includes('svg *{color:#EDEDED !important}'), "the selection backstop must be present");
+assert(css.indexOf(backstop) > css.indexOf('[class*="_card"]{background:#C8C4BC'), "the backstop must come after the black-forcing rules so it also wins ties by order");
+assert(specificity(backstop) > specificity('body[data-dsh-skin="win2000"] [class*="iconButton"] svg'), "the backstop must outrank the black icon-button rule");
 // The turn navigator's quick-jump marks are buttons, so the blanket bevel would
 // frame each one. The exclusion must target them specifically and outrank the
 // bevel rules, otherwise every mark keeps a frame.
 const markRule = css.match(/body\[data-dsh-skin="win2000"\] nav\[aria-label\] button\[data-index\][^{]*\{[^}]*\}/);
 assert(markRule !== null, "the turn navigator marks must be excluded from the bevel");
 assert(markRule[0].includes("box-shadow:none !important"), "the marks must carry no bevel at all");
-const specificity = (selector) => {
-    const ids = (selector.match(/#[\w-]+/g) ?? []).length;
-    const rest = selector.replace(/#[\w-]+/g, "");
-    const classes = (rest.match(/\.[\w-]+|\[[^\]]+\]|:(?!:)[\w-]+/g) ?? []).length;
-    const types = (rest.replace(/\.[\w-]+|\[[^\]]+\]|::?[\w-]+(\([^)]*\))?/g, " ").match(/[a-zA-Z][\w-]*/g) ?? []).length;
-    return ids * 10000 + classes * 100 + types;
-};
 const markSelector = markRule[0].slice(0, markRule[0].indexOf("{"));
 const bevelSelector = 'body[data-dsh-skin="win2000"] :is(button,summary):active';
 assert(specificity(markSelector) > specificity(bevelSelector), `the mark exclusion (${specificity(markSelector)}) must outrank the pressed bevel (${specificity(bevelSelector)})`);
@@ -400,5 +423,10 @@ for (const cleanup of effects) cleanup();
 equal(body.getAttribute("data-dsh-skin"), null, "dispose must strip the skin attribute");
 equal(attributes.get("color-scheme"), "", "dispose must release the color scheme");
 equal(storage.get("dsh.skin.win2000"), undefined, "dispose must drop the remembered choices");
+
+// The blanket text rule matches every descendant with `*`, which also matches the
+// icon svg; the icon rule names `svg` and must outrank it, or icons turn light.
+assert(specificity('body[data-dsh-skin="win2000"] :is([class*="_selected"]) *') <= specificity('body[data-dsh-skin="win2000"] :is([class*="_selected"]) svg'), "the icon rule must not lose to the blanket text rule");
+assert(css.includes('[class*="iconButton"] svg,body[data-dsh-skin="win2000"] [class*="IconButton"] svg{width:12px;height:12px;color:#000000}'), "plain icon buttons keep their black glyphs on grey");
 
 console.log(`ok — spec verified, ${tokenCount} tokens, ${css.length} bytes of CSS, specimen window driven, panel driven, dispose clean`);

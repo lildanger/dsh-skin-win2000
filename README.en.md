@@ -94,12 +94,12 @@ Reload the page. **If nothing changes, force a reload with `Ctrl+Shift+R`** — 
 
 ### About fonts
 
-The skin **ships the bitmap face it renders with**: `fonts/unsciiCJKV18.otf` (6.37 MB) travels inside the package, served by the host half at `/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf`.
+The skin **ships the bitmap face it renders with**: `fonts/unsciiCJKV18.woff2` (1.42 MB, converted losslessly from a 6.37 MB OTF) travels inside the package, served by the host half at `/api/dsh-skin-win2000/fonts/unsciiCJKV18.woff2`.
 
 - The `@font-face` declares **no `local()` source**, so a copy installed on the machine can never take precedence — every installation renders identically
 - Only that one family is declared, and the stack is `"unsciiCJKV18", monospace`; no family this package does not carry is named
 - The response carries `cache-control: public, max-age=604800, immutable`, so a browser fetches it at most once a week, and `font-display: swap` keeps text visible until it lands
-- Licence: unscii itself is **public domain** — Viznut's own page says so ("the other variants are in the Public Domain", with only `unscii-16-full` under GPL because of Unifont) — and this face is a CJK extension of it, which a public-domain work permits. Full notes in [fonts/README.md](fonts/README.md)
+- The bundled font is **GPL**: it is a CJK extension of `unscii-16-full`, the one variant Viznut's page singles out as GPL because of Unifont (the others are public domain). The font's own `name` table records the derivation, and `fonts/COPYING` carries the licence text. **The skin itself stays MIT** — the font is data the stylesheet references, not code linked into the plugin. Full notes in [fonts/README.md](fonts/README.md)
 
 The rest of the skin **sets no font** (the only exception is the Marlett symbol glyphs in the window title buttons). Switch the panel's pixel-font toggle off and the interface uses your own font settings entirely.
 
@@ -164,7 +164,8 @@ dsh-skin-win2000/            ← the repository root IS the package
 ├── check.mjs                minimal runnable check
 ├── verify-metrics.mjs       colour regression against the metric table
 ├── tools/capture.mjs        captures the README images over CDP
-├── fonts/unsciiCJKV18.otf     the bundled bitmap face (6.37 MB)
+├── fonts/unsciiCJKV18.woff2   the bundled bitmap face (1.42 MB, WOFF2)
+├── fonts/COPYING              the GPL text (the face derives from unscii-16-full)
 ├── docs/screenshots/        the three captured PNGs
 ├── HANDOFF.md               handoff notes: structure, line numbers, pitfalls
 ├── README.md                the Chinese introduction (the default)

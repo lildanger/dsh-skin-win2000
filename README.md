@@ -94,12 +94,12 @@ dsh plugin --profile web add link:/path/to/dsh-skin-win2000
 
 ### 关于字体
 
-皮肤**自带**它渲染文字用的点阵字体：`fonts/unsciiCJKV18.otf`（6.37 MB）随包分发，由宿主半侧在 `/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf` 提供。
+皮肤**自带**它渲染文字用的点阵字体：`fonts/unsciiCJKV18.woff2`（**1.42 MB**，由 6.37 MB 的 OTF 无损转换而来）随包分发，由宿主半侧在 `/api/dsh-skin-win2000/fonts/unsciiCJKV18.woff2` 提供。
 
 - `@font-face` **不写 `local()`**，所以机器上装了什么字体都不会抢先——每台机器渲染结果一致
 - 只声明这一个字体族，字体栈为 `"unsciiCJKV18", monospace`，不再引用包里没有的字体
 - 响应带 `cache-control: public, max-age=604800, immutable`，浏览器每周最多下载一次；`font-display: swap` 保证字体到达前文字可见
-- 字体许可：unscii 本体是 **Public Domain**（Viznut 官方页面写明「除 unscii-16-full 因 Unifont 而受 GPL 约束外，其余变体均属公有领域」），本字体是它的 CJK 扩展衍生版 —— 公有领域的作品可以自由修改与再分发。完整说明见 [fonts/README.md](fonts/README.md)
+- 字体许可是 **GPL**：本字体衍生自 `unscii-16-full`，而 Viznut 官方页面明确把它单独列为「因 Unifont 而受 GPL 约束」（其余变体才是公有领域）。字体自带的 `name` 表也记着这层关系，`fonts/COPYING` 附了许可全文。**皮肤本身仍是 MIT** —— 字体是被样式表引用的数据，不是链接进插件的代码。详见 [fonts/README.md](fonts/README.md)
 
 皮肤其余部分**不设置字体**：唯一例外是窗口标题按钮的 Marlett 符号字形。如果你关掉面板里的「点阵字体」开关，界面就完全用你自己的字体设置。
 
@@ -164,7 +164,8 @@ dsh-skin-win2000/            ← 仓库根就是包本体
 ├── check.mjs                最小可运行检查
 ├── verify-metrics.mjs       度量表配色回归
 ├── tools/capture.mjs        通过 CDP 抓取运行中界面的真实截图
-├── fonts/unsciiCJKV18.otf     随包分发的点阵字体（6.37 MB）
+├── fonts/unsciiCJKV18.woff2   随包分发的点阵字体（1.42 MB，WOFF2）
+├── fonts/COPYING              GPL 许可全文（字体衍生自 unscii-16-full）
 ├── docs/screenshots/        README 用的三张实拍 PNG
 ├── HANDOFF.md               交接文档：结构、行号、踩坑记录
 ├── README.en.md             英文版说明

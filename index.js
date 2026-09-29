@@ -60,7 +60,11 @@ export function apply(ctx) {
                     return;
                 }
                 res.writeHead(200, {
-                    "content-type": name.endsWith(".otf") ? "font/otf" : "font/ttf",
+                    "content-type": name.endsWith(".woff2")
+                        ? "font/woff2"
+                        : name.endsWith(".otf")
+                          ? "font/otf"
+                          : "font/ttf",
                     "cache-control": "public, max-age=604800, immutable",
                     "access-control-allow-origin": "*",
                 });

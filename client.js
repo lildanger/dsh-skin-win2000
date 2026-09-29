@@ -266,13 +266,13 @@ window.__ModuleLoader__.load({
             "--dsw-alias-state-warn-tertiary": "#FFF4CE",
 
             /* diffs */
-            "--dsw-alias-code-diff-added": "#00800014",
-            "--dsw-alias-code-diff-deleted": "#CC000014",
-            "--dsw-alias-file-diff-added-bg": "#E6FFEC",
-            "--dsw-alias-file-diff-added-gutter": "#DCFFE4",
+            "--dsw-alias-code-diff-added": "#00800033",
+            "--dsw-alias-code-diff-deleted": "#CC000033",
+            "--dsw-alias-file-diff-added-bg": "#CCFFCC",
+            "--dsw-alias-file-diff-added-gutter": "#B4EEB4",
             "--dsw-alias-file-diff-added-marker": "#008000",
-            "--dsw-alias-file-diff-deleted-bg": "#FFEBE9",
-            "--dsw-alias-file-diff-deleted-gutter": "#FFDCE0",
+            "--dsw-alias-file-diff-deleted-bg": "#FFCCCC",
+            "--dsw-alias-file-diff-deleted-gutter": "#FFB4B4",
             "--dsw-alias-file-diff-deleted-marker": "#CC0000",
 
             /* onboarding */
@@ -391,8 +391,8 @@ body[data-dsh-skin="win2000"] nav[aria-label] button[data-index]:hover,
 body[data-dsh-skin="win2000"] nav[aria-label] button[data-index]:active,
 body[data-dsh-skin="win2000"] nav[aria-label] button[data-index]:focus-visible{box-shadow:none !important;background:transparent !important;outline:none !important}
 body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]){background-color:#0A246A !important;color:#EDEDED !important}
-body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) :is(span,div,p,a,time){color:#EDEDED !important}
-body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) svg{color:#000000 !important}
+body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) *{color:#EDEDED !important}
+body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) svg,body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) svg *{color:#EDEDED !important}
 body[data-dsh-skin="win2000"] input[type="checkbox"],[data-dsh-skin-window] [data-dsh-skin-check] input{width:13px;height:13px;margin:0;appearance:none;-webkit-appearance:none;background:#F4F4F4 !important;box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF !important}
 body[data-dsh-skin="win2000"] input[type="checkbox"]:checked,[data-dsh-skin-window] [data-dsh-skin-check] input:checked{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='7' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M7 0H6v1H5v1H4v1H3v1H2V3H1V2H0v3h1v1h1v1h1V6h1V5h1V4h1V3h1V0z' fill='%23000'/%3E%3C/svg%3E") !important;background-position:center !important;background-repeat:no-repeat !important}
 body[data-dsh-skin="win2000"] *::-webkit-scrollbar{width:16px;height:16px}
@@ -427,7 +427,7 @@ body[data-dsh-skin="win2000"] [class$="_handle"][data-dragging]{background:#C8C4
 /* The bitmap face ships inside this package and is served by the host from it,
    so every installation renders identically instead of depending on locally
    installed fonts. */
-@font-face{font-family:"unsciiCJKV18";src:url("/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf") format("opentype"),local("unsciiCJKV18");font-display:swap}
+@font-face{font-family:"unsciiCJKV18";src:url("/api/dsh-skin-win2000/fonts/unsciiCJKV18.woff2") format("woff2"),local("unsciiCJKV18");font-display:swap}
 body[data-dsh-skin="win2000"][data-dsh-skin-pixel],body[data-dsh-skin="win2000"][data-dsh-skin-pixel] :is(button,input,select,textarea,pre,code,div,span,p,a,label,h1,h2,h3,h4,table,th,td){font-family:"unsciiCJKV18",monospace !important;font-size:16px !important;line-height:1.25 !important;font-weight:normal !important;font-synthesis:none !important;-webkit-font-smoothing:none !important;text-rendering:optimizeSpeed !important}
 /* The face ships a single weight, so a request for bold (or italic) makes the
    browser synthesise an outline stroke — on a pixel grid that smears the glyph
@@ -480,10 +480,18 @@ body[data-dsh-skin="win2000"] blockquote{padding:4px 12px !important;border-left
 /* Tooltip bubbles read their text colour from the static ramp's brightest step
    (--dsw-static-neutral-bluish-00), which this skin keeps light on purpose; the
    bubble is the one surface that needs dark text, so it is named here. */
+/* Changed-file counters keep their meaning: additions green, deletions red.
+   The second attribute selector is only there to raise specificity. */
+/* The diff signs take the marker colour their own row defines: green on an
+   added line, red on a deleted one. Custom properties inherit, so one rule
+   covers both. */
+body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] [class*="_sign"]{color:var(--diff-marker,currentColor) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] [class*="_added"]{color:var(--dsw-alias-state-success-primary) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] [class*="_deleted"]{color:var(--dsw-alias-state-error-primary) !important}
 body[data-dsh-skin="win2000"] [class*="bubble"]{color:#000 !important;background:#FFFFE1 !important;border-radius:0 !important}
 /* Tool and command cards, popover cards, and hover cards: text must be black on light grey background */
 body[data-dsh-skin="win2000"] :is([class*="_card"],[class*="hoverContent"],[class*="hoverTitle"],[class*="hoverTime"],[class*="hoverStatus"],[class*="popup"],[class*="Popover"],[role="tooltip"]){color:#000000 !important;border-radius:0 !important}
-body[data-dsh-skin="win2000"] :is([class*="_card"],[class*="hoverContent"],[class*="popup"],[class*="Popover"],[role="tooltip"]) :is(div,span,p,a,time,label,h1,h2,h3,h4){color:#000000 !important}
+body[data-dsh-skin="win2000"] :is([class*="_card"],[class*="hoverContent"],[class*="popup"],[class*="Popover"],[role="tooltip"]) :is(div,span,p,a,time,label,h1,h2,h3,h4):not([aria-selected="true"] *):not([data-selected="true"] *):not([class*="_selected"] *):not([class*="_added"]):not([class*="_deleted"]):not([class*="_sign"]){color:#000000 !important}
 body[data-dsh-skin="win2000"] [class*="_card"]{background:#C8C4BC !important;color:#000000 !important;border-radius:0 !important;box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080 !important}
 body[data-dsh-skin="win2000"] :is([class*="_card"],[class*="Card"]){--changes-fill:#BFBBB2 !important;--changes-hover:#B4B0A7 !important}
 /* Sidebar session icon buttons: keep clean, centered, and visible icons */
@@ -498,6 +506,12 @@ body[data-dsh-skin="win2000"] [class*="iconButton"],body[data-dsh-skin="win2000"
 body[data-dsh-skin="win2000"] [class*="iconButton"]:hover,body[data-dsh-skin="win2000"] [class*="IconButton"]:hover{box-shadow:inset 1px 1px 0 #F5F5F5,inset -1px -1px 0 #000000,inset 2px 2px 0 #DFDFDF,inset -2px -2px 0 #808080,inset 0 0 0 100px #0A246A1a !important}
 body[data-dsh-skin="win2000"] [class*="iconButton"]:active,body[data-dsh-skin="win2000"] [class*="IconButton"]:active{box-shadow:inset 1px 1px 0 #000000,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #808080,inset -2px -2px 0 #DFDFDF !important}
 body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2000"] [class*="IconButton"] svg{width:12px;height:12px;color:#000000}
+/* Global backstop: nothing inside a navy selection may be black. The doubled
+   attribute selector exists only to outrank the rules that force black text on
+   cards and inside icon buttons; without it those win and the row is unreadable. */
+body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) *,
+body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) svg,
+body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) svg *{color:#EDEDED !important}
 `;
 
 

@@ -30,8 +30,8 @@ assert.equal(
 // Reproduce the server's own match rule, because a wrong prefix fails silently by
 // falling through to the SPA fallback, which answers 404.
 const matches = (prefix, pathname) => pathname === prefix || pathname.startsWith(`${prefix}/`);
-assert.ok(matches(route.path, "/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf"), "the prefix must match the URL the stylesheet requests");
-assert.ok(!matches("/api/dsh-skin-win2000/fonts/", "/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf"), "a trailing slash in the stored prefix is exactly the bug this guards against");
+assert.ok(matches(route.path, "/api/dsh-skin-win2000/fonts/unsciiCJKV18.woff2"), "the prefix must match the URL the stylesheet requests");
+assert.ok(!matches("/api/dsh-skin-win2000/fonts/", "/api/dsh-skin-win2000/fonts/unsciiCJKV18.woff2"), "a trailing slash in the stored prefix is exactly the bug this guards against");
 
 /** Collect a response into { status, headers, bytes }. */
 const fetchRoute = (url) =>
@@ -58,11 +58,11 @@ const fetchRoute = (url) =>
     });
 
 // The bundled face is what an installed copy serves.
-const font = await fetchRoute("/api/dsh-skin-win2000/fonts/unsciiCJKV18.otf");
+const font = await fetchRoute("/api/dsh-skin-win2000/fonts/unsciiCJKV18.woff2");
 assert.equal(font.status, 200, "the bundled font must be served");
-assert.equal(font.headers["content-type"], "font/otf", "an .otf must be typed as font/otf");
-assert.ok(font.body.length > 6_000_000, `the served font must be the real file, got ${font.body.length} bytes`);
-assert.equal(font.body.subarray(0, 4).toString("latin1"), "OTTO", "the payload must be an OTF, not an error page");
+assert.equal(font.headers["content-type"], "font/woff2", "a .woff2 must be typed as font/woff2");
+assert.ok(font.body.length > 1_000_000, `the served font must be the real file, got ${font.body.length} bytes`);
+assert.equal(font.body.subarray(0, 4).toString("latin1"), "wOF2", "the payload must be a WOFF2, not an error page");
 console.log(`  ok  bundled font: ${font.body.length} bytes, ${font.headers["content-type"]}`);
 
 // A font this package does not ship resolves from nowhere: 404, not a crash.
