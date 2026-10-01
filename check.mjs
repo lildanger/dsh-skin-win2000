@@ -182,6 +182,13 @@ assert(css.includes('@font-face{font-family:"unsciiCJKV18";src:url("/api/dsh-ski
 assert(/src:url\("\/api\/dsh-skin-win2000\/fonts\/unsciiCJKV18\.woff2"\) format\("woff2"\),local\("unsciiCJKV18"\)/.test(css), "the packaged face must come first in src, with a local() copy only behind it as a fallback");
 assert(!/fonts\/(zpix|PixelCode|unscii-16-full)/.test(css), "no declaration may point at a font this package does not ship");
 assert(css.includes("unsciiCJKV18.woff2"), "the shipped face must be the woff2 build");
+assert(css.includes('@font-face{font-family:"unscii8Tall";src:url("/api/dsh-skin-win2000/fonts/unscii8Tall.woff2") format("woff2");unicode-range:U+0000-024F,U+2000-206F'), "the tall face must cover Latin and punctuation");
+assert(css.includes("U+2500-257F,U+2580-259F,U+25A0-25FF,U+2600-26FF,U+E000-F8FF"), "the tall face must cover box drawing, blocks, geometric shapes, misc symbols and PUA — otherwise code trees render at 16px beside 8px text");
+assert(!/font-family:"unscii8Tall"[^}]*U\+4E00/.test(css), "CJK must not enter the tall face range; Chinese inside code stays on CJKV18");
+assert(!/@font-face\{font-family:"unscii8Tall"[^}]*font-weight/.test(css), "the tall face must not be selected by weight; that makes the engine skip the family for bold CJK");
+assert(css.includes('[class*="_switch"] > *{border-radius:0 !important}'), "the switch thumb must be square, not a circle");
+assert(css.includes(':is(b,strong,[class*="bold"],[class*="Bold"]){font-weight:normal}'), "emphasis must render at normal weight: no unscii variant ships a bold cut");
+assert(!/font-family:"unscii8Tall","unsciiCJKV18"/.test(css), "code must not switch faces; every run shares CJKV18");
 assert(css.includes("font-synthesis:none !important"), "synthetic bold must stay off: the face carries one weight, and a synthesised stroke blurs the pixel grid");
 assert(css.includes("text-rendering:optimizeSpeed"), "the pixel face must snap glyphs to whole pixels: optimizeSpeed does, geometricPrecision explicitly does not");
 assert(!css.includes("geometricPrecision"), "geometricPrecision defeats the pixel grid and fringes every 1px stem");

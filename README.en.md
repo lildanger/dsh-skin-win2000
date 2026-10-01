@@ -114,8 +114,10 @@ Reload the page. **If nothing changes, force a reload with `Ctrl+Shift+R`** — 
 
 The skin **ships the bitmap face it renders with**: `fonts/unsciiCJKV18.woff2` (1.42 MB, converted losslessly from a 6.37 MB OTF) travels inside the package, served by the host half at `/api/dsh-skin-win2000/fonts/unsciiCJKV18.woff2`.
 
-- The `@font-face` declares **no `local()` source**, so a copy installed on the machine can never take precedence — every installation renders identically
-- Only that one family is declared, and the stack is `"unsciiCJKV18", monospace`; no family this package does not carry is named
+- The `@font-face` leads with the packaged `url()` and follows it with a `local()` fallback, so the packaged copy always takes precedence — every installation renders identically
+- The stack is `"unsciiCJKV18", monospace`; no family this package does not carry is named
+- **Code uses a second face**: `pre/code/kbd/samp` render in `unscii-8-tall` (an 8-pixel-tall monospaced variant, 59 KB → 40 KB as WOFF2), while Chinese inside code still comes from CJKV18 (`unicode-range` covers Latin, punctuation, arrows, maths, box drawing, blocks, geometric shapes and the PUA — every non-CJK block the tall face carries — so code trees, block runs and arrows are all 8px like the English beside them instead of 16px CJKV18; Chinese, kana and fullwidth forms stay on CJKV18). Body text keeps one face for mixed Chinese and English, so they share a baseline
+- **Bold is not synthesised**: every unscii variant ships a single weight with no bold cut, and a bitmap face smears when the engine fakes one — so emphasis elements (`b`, `strong`, bold classes) **render at the regular weight of 400**. The 500/600 weights the application sets on its own named classes (settings section titles, for instance) are not affected and stay as they are
 - The response carries `cache-control: public, max-age=604800, immutable`, so a browser fetches it at most once a week, and `font-display: swap` keeps text visible until it lands
 - The bundled font is **GPL**: it is a CJK extension of `unscii-16-full`, the one variant Viznut's page singles out as GPL because of Unifont (the others are public domain). The font's own `name` table records the derivation, and `fonts/COPYING` carries the licence text. **The skin itself stays MIT** — the font is data the stylesheet references, not code linked into the plugin. Full notes in [fonts/README.md](fonts/README.md)
 

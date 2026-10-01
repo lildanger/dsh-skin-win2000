@@ -1,0 +1,124 @@
+// Verify the five target rows, and — the risky part — that DSH's own 500/600 weights
+// on named elements survive the suppression rule.
+import { spawn } from "node:child_process";
+import { rmSync } from "node:fs";
+import { createRequire } from "node:module";
+
+const require = createRequire("file:///D:/Desktop/fuck/DSH/");
+const WebSocket = require("C:/Users/dange/.dsh/profiles/node_modules/ws");
+
+const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
+const PORT = 9376;
+const PROFILE = `${process.env.TEMP}\\dsh-target-weights`;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+rmSync(PROFILE, { recursive: true, force: true });
+const chrome = spawn(CHROME, [
+    "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check",
+    `--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`,
+    "--window-size=1440,900", "about:blank",
+], { stdio: "ignore" });
+
+const endpoint = async () => {
+    for (let i = 0; i < 60; i++) {
+        try {
+            const json = await (await fetch(`http://127.0.0.1:${PORT}/json/version`)).json();
+            if (json.webSocketDebuggerUrl) return json.webSocketDebuggerUrl;
+        } catch { /* not up */ }
+        await sleep(500);
+    }
+    throw new Error("no devtools endpoint");
+};
+
+const ws = new WebSocket(await endpoint(), { perMessageDeflate: false, maxPayload: 256 * 1024 * 1024 });
+await new Promise((res, rej) => { ws.once("open", res); ws.once("error", rej); });
+let nextId = 1;
+const pending = new Map();
+ws.on("message", (raw) => {
+    const msg = JSON.parse(raw.toString());
+    if (msg.id !== undefined && pending.has(msg.id)) {
+        const { resolve, reject } = pending.get(msg.id);
+        pending.delete(msg.id);
+        if (msg.error) reject(new Error(JSON.stringify(msg.error)));
+        else resolve(msg.result);
+    }
+});
+const send = (method, params = {}, sessionId) =>
+    new Promise((resolve, reject) => {
+        const id = nextId++;
+        pending.set(id, { resolve, reject });
+        ws.send(JSON.stringify({ id, method, params, ...(sessionId ? { sessionId } : {}) }));
+    });
+
+const { targetInfos } = await send("Target.getTargets");
+const page = targetInfos.find((t) => t.type === "page");
+const { sessionId } = await send("Target.attachToTarget", { targetId: page.targetId, flatten: true });
+await send("Page.enable", {}, sessionId);
+await send("Runtime.enable", {}, sessionId);
+await send("DOM.enable", {}, sessionId);
+await send("CSS.enable", {}, sessionId);
+const WEB_PORT = process.argv[2] ?? "3081";
+await send("Page.navigate", { url: `http://127.0.0.1:${WEB_PORT}/` }, sessionId);
+
+const evaluate = async (expression) => {
+    const { result } = await send("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true }, sessionId);
+    return result?.value;
+};
+const deadline = Date.now() + 45000;
+while (Date.now() < deadline && !(await evaluate("!!document.querySelector('[data-dsh-skin-panel]')"))) await sleep(700);
+await sleep(2500);
+
+await evaluate(`(() => {
+    document.body.setAttribute('data-dsh-skin-pixel', '');
+    const host = document.createElement('div');
+    host.style.cssText = 'position:fixed;left:8px;bottom:8px;font-size:28px;line-height:1.4;z-index:9999';
+    host.innerHTML =
+        '<span id="t-plain">ABCDEFGHIJ</span><br>' +
+        '<strong id="t-bold-en">ABCDEFGHIJ</strong><br>' +
+        '<span id="t-cjk">中文测试</span><br>' +
+        '<strong id="t-bold-cjk">中文测试</strong><br>' +
+        '<pre style="margin:0;font-size:28px"><code id="t-code">ABCDEFGHIJ</code></pre>';
+    document.body.appendChild(host);
+})()`);
+await sleep(2000);
+
+const rows = await evaluate(`(() => {
+    const ids = ['t-plain','t-bold-en','t-cjk','t-bold-cjk','t-code'];
+    return ids.map((id) => {
+        const el = document.getElementById(id);
+        const cs = getComputedStyle(el);
+        return { id, weight: cs.fontWeight, family: cs.fontFamily };
+    });
+})()`);
+
+console.log("注入的五个目标：");
+for (const r of rows) console.log("  " + r.id.padEnd(12) + "weight=" + r.weight.padEnd(6) + "family=" + r.family);
+
+// Now the real thing: does any DSH element that sets 500/600 keep it?
+await evaluate(`(() => {
+    const el = [...document.querySelectorAll('button,a,[role="button"]')].find((n) => n.textContent.trim() === '设置');
+    if (el) el.click();
+})()`);
+await sleep(3500);
+
+const real = await evaluate(`(() => {
+    const out = [];
+    for (const el of document.querySelectorAll('*')) {
+        const cs = getComputedStyle(el);
+        const w = parseInt(cs.fontWeight, 10);
+        if (!(w >= 500)) continue;
+        const t = el.textContent.trim();
+        if (!t || t.length > 24) continue;
+        if ([...el.children].filter((c) => c.textContent.trim()).length > 1) continue;
+        out.push({ w: cs.fontWeight, tag: el.tagName.toLowerCase(), cls: String(el.className).slice(0, 30), text: t.slice(0, 18) });
+        if (out.length >= 8) break;
+    }
+    return out;
+})()`);
+
+console.log("\n设置页上应用自己设的 >=500 的字重（应保持不动）：");
+if (real.length === 0) console.log("  （这个页面没有）");
+for (const r of real) console.log("  " + r.tag.padEnd(7) + "weight=" + r.w.padEnd(6) + JSON.stringify(r.text) + "  cls=" + r.cls);
+
+ws.close();
+chrome.kill();

@@ -1,6 +1,14 @@
 # Bundled font
 
-`unsciiCJKV18.woff2` — the bitmap face this skin renders text in.
+Two faces ship here: `unsciiCJKV18.woff2` renders body text (Chinese and English
+alike, so mixed lines share a baseline), and `unscii8Tall.woff2` renders code —
+`pre`, `code`, `kbd` and `samp` — where an 8-pixel-tall monospaced bitmap belongs.
+The tall face carries a `unicode-range` spanning every non-CJK block it actually
+holds — Latin and Latin-1, general punctuation, sub/superscripts, currency, arrows,
+maths operators, box drawing, block elements, geometric shapes, misc symbols and the
+PUA private-use area — so a code block's trees, blocks and arrows are 8px tall like
+the English beside them. Chinese, kana and fullwidth forms are deliberately left out
+of that range, so text inside a code block still falls back to CJKV18.
 
 ## Why it is bundled
 

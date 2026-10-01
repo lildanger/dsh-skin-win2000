@@ -115,8 +115,10 @@ dsh --profile web --dump-config | grep skin-win2000   # 配置里有
 
 皮肤**自带**它渲染文字用的点阵字体：`fonts/unsciiCJKV18.woff2`（**1.42 MB**，由 6.37 MB 的 OTF 无损转换而来）随包分发，由宿主半侧在 `/api/dsh-skin-win2000/fonts/unsciiCJKV18.woff2` 提供。
 
-- `@font-face` **不写 `local()`**，所以机器上装了什么字体都不会抢先——每台机器渲染结果一致
-- 只声明这一个字体族，字体栈为 `"unsciiCJKV18", monospace`，不再引用包里没有的字体
+- `@font-face` 以包内 `url()` 打头，后面跟一个 `local()` 兜底（本机恰好装了同名字体时省一次下载）；**包内那份永远优先**，渲染结果与机器无关
+- 字体栈为 `"unsciiCJKV18", monospace`，不引用包里没有的字体
+- **代码块另用一副字体**：`pre/code/kbd/samp` 里走 `unscii-8-tall`（8 像素高的等宽变体，59 KB → WOFF2 40 KB），它把 `unicode-range` 覆盖到**拉丁、标点、箭头、数学、制表、方块、几何图形与 PUA 私用区**（tall 能提供的全部非 CJK 字符都归它），所以代码里的目录树 `├──`、方块 `██▒░`、箭头 `→` 都与英文同为 8 像素高，不再与 16 像素的 CJKV18 混排；**汉字、假名与全角标点仍留在 CJKV18**。正文中英混排统一用 CJKV18，共用一条基线
+- **粗体不合成**：unscii 全家族都只有单一字重，没有 bold 变体，而点阵字被引擎拉伸伪造粗体会发糊 —— 所以 `b`/`strong`/bold 类这些强调元素**按正体字重（400）渲染**。应用自己用命名类设的 500/600（例如设置页的栏目标题）不在此列，保持原样
 - 响应带 `cache-control: public, max-age=604800, immutable`，浏览器每周最多下载一次；`font-display: swap` 保证字体到达前文字可见
 - 字体许可是 **GPL**：本字体衍生自 `unscii-16-full`，而 Viznut 官方页面明确把它单独列为「因 Unifont 而受 GPL 约束」（其余变体才是公有领域）。字体自带的 `name` 表也记着这层关系，`fonts/COPYING` 附了许可全文。**皮肤本身仍是 MIT** —— 字体是被样式表引用的数据，不是链接进插件的代码。详见 [fonts/README.md](fonts/README.md)
 

@@ -397,6 +397,17 @@ body[data-dsh-skin="win2000"] input[type="checkbox"],[data-dsh-skin-window] [dat
 body[data-dsh-skin="win2000"] input[type="checkbox"]:checked,[data-dsh-skin-window] [data-dsh-skin-check] input:checked{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='7' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M7 0H6v1H5v1H4v1H3v1H2V3H1V2H0v3h1v1h1v1h1V6h1V5h1V4h1V3h1V0z' fill='%23000'/%3E%3C/svg%3E") !important;background-position:center !important;background-repeat:no-repeat !important}
 body[data-dsh-skin="win2000"] *::-webkit-scrollbar{width:16px;height:16px}
 body[data-dsh-skin="win2000"] *::-webkit-scrollbar-track{background:#D4D0C8;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='2' height='2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M1 0H0v1h1v1h1V1H1V0z' fill='%23D4D0C8'/%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M2 0H1v1H0v1h1V1h1V0z' fill='%23F5F5F5'/%3E%3C/svg%3E");box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF}
+/* The switch thumb is a classless child span carrying a 50% radius, which reads
+   as a modern pill. Square it so the control matches its own square track. */
+body[data-dsh-skin="win2000"] [class*="_switch"] > *{border-radius:0 !important}
+/* The track is 36px wide with 6px padding, so a 16px thumb travels 8px — not the 16px
+   the component translates it by, which pushed the square 8px past the right edge. */
+body[data-dsh-skin="win2000"] [class*="_switch"][aria-checked="true"] > *{transform:translateX(12px) !important}
+/* The track is 20px tall with padding-top 3 and padding-bottom 0, leaving a 17px
+   content box for a 16px thumb: 1px of slack that cannot be split, so the thumb
+   sits flush with the top. 2/2 makes the content box exactly 16px and centres it. */
+body[data-dsh-skin="win2000"] [class*="_switch"]{padding-top:2px !important;padding-bottom:2px !important}
+
 /* The theme package paints the thumb with background-clip:content-box and a
    transparent border, which insets the painted box: measured against the trough
    the thumb came out 1px narrower and 1px to the left, with its light left edge
@@ -428,7 +439,21 @@ body[data-dsh-skin="win2000"] [class$="_handle"][data-dragging]{background:#C8C4
    so every installation renders identically instead of depending on locally
    installed fonts. */
 @font-face{font-family:"unsciiCJKV18";src:url("/api/dsh-skin-win2000/fonts/unsciiCJKV18.woff2") format("woff2"),local("unsciiCJKV18");font-display:swap}
-body[data-dsh-skin="win2000"][data-dsh-skin-pixel],body[data-dsh-skin="win2000"][data-dsh-skin-pixel] :is(button,input,select,textarea,pre,code,div,span,p,a,label,h1,h2,h3,h4,table,th,td){font-family:"unsciiCJKV18",monospace !important;font-size:16px !important;line-height:1.25 !important;font-weight:normal !important;font-synthesis:none !important;-webkit-font-smoothing:none !important;text-rendering:optimizeSpeed !important}
+/* Bold Latin takes the 8-tall face: same family, weight 700, and a range that
+   stops before CJK. Regular text keeps CJKV18; Chinese outside the range falls
+   back to CJKV18 and is synthesised exactly as before. */
+/* The tall face stays declared but unreferenced: code now shares CJKV18 with the rest
+   of the page, so a mixed line is one 8x16 face. Nothing pulls it down until a rule
+   names the family, and it costs nothing until then. */
+@font-face{font-family:"unscii8Tall";src:url("/api/dsh-skin-win2000/fonts/unscii8Tall.woff2") format("woff2");unicode-range:U+0000-024F,U+2000-206F,U+2070-209F,U+20A0-20CF,U+2190-21FF,U+2200-22FF,U+2500-257F,U+2580-259F,U+25A0-25FF,U+2600-26FF,U+E000-F8FF;font-display:swap}
+body[data-dsh-skin="win2000"][data-dsh-skin-pixel],body[data-dsh-skin="win2000"][data-dsh-skin-pixel] :is(button,input,select,textarea,pre,code,div,span,p,a,label,h1,h2,h3,h4,table,th,td){font-family:"unsciiCJKV18",monospace !important;font-size:16px !important;line-height:1.25 !important;font-synthesis:none !important;-webkit-font-smoothing:none !important;text-rendering:optimizeSpeed !important}
+
+/* Emphasis elements — markdown's <strong>, or a bold class — render at normal weight.
+   A bitmap face smears when the engine synthesises bold, and no unscii variant ships a
+   real bold cut. Named DSH elements that set 500/600 themselves never match this
+   selector, so Chinese headings keep the weight the application gives them. */
+body[data-dsh-skin="win2000"][data-dsh-skin-pixel] :is(b,strong,[class*="bold"],[class*="Bold"]){font-weight:normal}
+
 /* The face ships a single weight, so a request for bold (or italic) makes the
    browser synthesise an outline stroke — on a pixel grid that smears the glyph
    into grey. The font-synthesis:none above is inherited, so no descendant can
