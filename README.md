@@ -78,9 +78,28 @@ dsh plugin --profile web add github:lildanger/dsh-skin-win2000
 dsh plugin --profile web add link:/path/to/dsh-skin-win2000
 ```
 
-### 装完还要做一步
+### DSH 0.2.0 起：必须登记在 profile 依赖里
 
-如果包**不是**作为 bundle 层被自动加载（例如用了 `link:` 或手动拷贝），需要在你 profile 的 `cordis.patch.yml` 里插入一行：
+**这一步不做，皮肤装了也不会出现** —— 配置里能看到它，界面上毫无变化。
+
+DSH 0.2.0 之前，插件可以只用 `node_modules` 里的链接 + 一条 patch 行挂载；**0.2.0 起宿主端先查 profile 的 `dependencies`，没登记的行会被静默跳过**（客户端清单里根本没有它）。
+
+上面三种方式用的都是 `dsh plugin add`，它会自动登记依赖。**如果你是手工挂载的**（比如直接建 junction/symlink 再往 patch 里加行），要补上登记：
+
+```bash
+dsh plugin --profile web add link:/path/to/dsh-skin-win2000
+```
+
+确认登记成功：
+
+```bash
+dsh --profile web --dump-config | grep skin-win2000   # 配置里有
+# 再确认客户端清单里有它（清单是启动时算的，改完依赖要重启 DSH）
+```
+
+### 还要一条 patch 行
+
+依赖登记之外，bundle 行仍要插进 profile 的 `cordis.patch.yml`：
 
 ```yaml
 - insert:

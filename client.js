@@ -390,9 +390,9 @@ body[data-dsh-skin="win2000"] nav[aria-label] button[data-index],
 body[data-dsh-skin="win2000"] nav[aria-label] button[data-index]:hover,
 body[data-dsh-skin="win2000"] nav[aria-label] button[data-index]:active,
 body[data-dsh-skin="win2000"] nav[aria-label] button[data-index]:focus-visible{box-shadow:none !important;background:transparent !important;outline:none !important}
-body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]){background-color:#0A246A !important;color:#EDEDED !important}
-body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) *{color:#EDEDED !important}
-body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) svg,body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) svg *{color:#EDEDED !important}
+body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[aria-current="true"],[class*="_selected"]){background-color:#0A246A !important;color:#EDEDED !important}
+body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[aria-current="true"],[class*="_selected"]) *{color:#EDEDED !important}
+body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[aria-current="true"],[class*="_selected"]) svg,body[data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[aria-current="true"],[class*="_selected"]) svg *{color:#EDEDED !important}
 body[data-dsh-skin="win2000"] input[type="checkbox"],[data-dsh-skin-window] [data-dsh-skin-check] input{width:13px;height:13px;margin:0;appearance:none;-webkit-appearance:none;background:#F4F4F4 !important;box-shadow:inset 1px 1px 0 #808080,inset -1px -1px 0 #F5F5F5,inset 2px 2px 0 #000000,inset -2px -2px 0 #DFDFDF !important}
 body[data-dsh-skin="win2000"] input[type="checkbox"]:checked,[data-dsh-skin-window] [data-dsh-skin-check] input:checked{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='7' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M7 0H6v1H5v1H4v1H3v1H2V3H1V2H0v3h1v1h1v1h1V6h1V5h1V4h1V3h1V0z' fill='%23000'/%3E%3C/svg%3E") !important;background-position:center !important;background-repeat:no-repeat !important}
 body[data-dsh-skin="win2000"] *::-webkit-scrollbar{width:16px;height:16px}
@@ -509,9 +509,9 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
 /* Global backstop: nothing inside a navy selection may be black. The doubled
    attribute selector exists only to outrank the rules that force black text on
    cards and inside icon buttons; without it those win and the row is unreadable. */
-body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) *,
-body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) svg,
-body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) svg *{color:#EDEDED !important}
+body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[aria-current="true"],[class*="_selected"]) *,
+body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[aria-current="true"],[class*="_selected"]) svg,
+body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[aria-current="true"],[class*="_selected"]) svg *{color:#EDEDED !important}
 `;
 
 

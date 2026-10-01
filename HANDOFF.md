@@ -202,6 +202,8 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 | 30 | **一条规则抢走另一条的语义色** | 卡片黑字规则 `:is(卡片) :is(span,…)` 特异性 (0,5,2)，压过 `_added`/`_deleted`/`_sign` 的语义色 | 给强规则加 `:not(…)` 排除；深蓝选中态另加一条**全局兜底**（重复属性选择器抬特异性 + 放在样式表末尾，靠顺序也赢） |
 | 31 | **杀进程范围过大，关掉用户浏览器** | `Get-Process chrome \| Stop-Process` 按进程名杀，把用户正在用的窗口一起杀了 | 只按命令行特征筛自己启动的实例：`Get-CimInstance Win32_Process -Filter "Name='chrome.exe'"` 再 `Where-Object { $_.CommandLine -like '*dsh-*-profile*' }`；脚本内的 `chrome.kill()` 本就只杀自己那个 |
 | 32 | **JS 双引号串里写半角引号** | `（含"xxx"的…）` 里的半角引号提前终止字符串 → `SyntaxError: Unexpected identifier`。**已踩两次** | 中文引号用「」或全角；或改用单引号/模板字符串 |
+| 34 | **升级 DSH 后皮肤不出现，配置里却看得到** | DSH 0.2.0 起宿主端先查 profile 的 `dependencies`；本插件当初只用 junction + patch 行挂载，没登记 → 行被静默跳过，客户端清单里没有它 | `dsh plugin --profile web add link:<仓库路径>` 登记依赖（会写进 profile 的 package.json，`link:` 形式仍指向仓库），然后**重启 DSH**（清单在启动时算）。确认方法：解析首页 `__DSH_BOOT__` 的 entries，看有没有 `dsh-skin-win2000` |
+| 35 | **深蓝高亮里的文字还是黑的** | 兜底选择器只认 `aria-selected` / `data-selected` / `class*="_selected"`，而 DSH 设置页的导航用 **`aria-current="true"`** 标记当前项 —— 第四类标记漏了 | 三条选中态规则 + 三条兜底规则全部加上 `[aria-current="true"]`。诊断用 `tools/inspect-settings-highlight.mjs`：它会打开设置页、列出所有深蓝元素并报出里面的黑色后代 |
 | 33 | `git add -A` 把提交消息文件卷进仓库 | 消息写在仓库内的临时 `.txt`，`add -A` 一并暂存。**已踩两次** | 消息文件写进 `$env:TEMP`，或把文件名加进 `.gitignore` |
 | 24 | PowerShell 吃掉/误解脚本内容 | here-string 里的反引号、引号、`!` 会被解析 | **用 `write` 工具写脚本文件**，再 `node 脚本` 执行；提交消息用 `git commit -F 文件` |
 

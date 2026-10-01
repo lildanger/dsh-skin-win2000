@@ -78,9 +78,27 @@ The repository must be public, and **the repository root must be the package** (
 dsh plugin --profile web add link:/path/to/dsh-skin-win2000
 ```
 
-### One more step after installing
+### Since DSH 0.2.0: the package must be in the profile's dependencies
 
-When the package is not picked up automatically as a bundle layer (a `link:` install, or a manual copy), insert one row into your profile's `cordis.patch.yml`:
+**Skip this and the skin installs but never appears** — the row shows up in the config while the interface stays unchanged.
+
+Before 0.2.0 a plugin could be mounted with nothing but a link inside `node_modules` plus a patch row. From 0.2.0 the host consults the profile's `dependencies` first and **silently skips any row it does not find there**, so the package never reaches the client manifest.
+
+All three routes above go through `dsh plugin add`, which registers the dependency for you. **If you mounted it by hand** (a junction or symlink plus a patch row), add the registration:
+
+```bash
+dsh plugin --profile web add link:/path/to/dsh-skin-win2000
+```
+
+Then confirm it landed, and remember the client manifest is computed at startup — **restart DSH after changing dependencies**:
+
+```bash
+dsh --profile web --dump-config | grep skin-win2000
+```
+
+### The patch row is still needed
+
+Registration does not replace the bundle row; that still goes into the profile's `cordis.patch.yml`:
 
 ```yaml
 - insert:

@@ -212,7 +212,7 @@ assert(css.includes("--dsw-alias-file-diff-deleted-bg:#FFCCCC !important"), "del
 assert(css.includes(':not([class*="_sign"]){color:#000000 !important}'), "the card black-text rule must not claim the diff signs");
 // A single backstop outranks every black-forcing rule inside a selection, so no
 // future rule can make a selected row unreadable by accident.
-const backstop = 'body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[class*="_selected"]) *';
+const backstop = 'body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[aria-current="true"],[class*="_selected"]) *';
 assert(css.includes(backstop + ",") && css.includes('svg *{color:#EDEDED !important}'), "the selection backstop must be present");
 assert(css.indexOf(backstop) > css.indexOf('[class*="_card"]{background:#C8C4BC'), "the backstop must come after the black-forcing rules so it also wins ties by order");
 assert(specificity(backstop) > specificity('body[data-dsh-skin="win2000"] [class*="iconButton"] svg'), "the backstop must outrank the black icon-button rule");
