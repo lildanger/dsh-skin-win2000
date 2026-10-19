@@ -318,6 +318,72 @@ find(window, (child) => child.children?.[0] === "激活(&A)").props.onClick();
 window = render("window", plugin.ClassicWindow);
 equal(window.props["data-dsh-skin-inactive"], "false", "activating must restore the active gradient");
 
+// ---- the window specimen drags from its title bar -----------------------
+// The stylesheet centres the window; a drag must move it, clamp it inside the
+// viewport, remember it, and a double click must hand it back to the CSS default.
+const windowPointer = (x, y) => ({
+    clientX: x,
+    clientY: y,
+    pointerId: 1,
+    target: { closest: () => null },
+    currentTarget: {
+        parentElement: { getBoundingClientRect: () => ({ left: 400, top: 160, width: 420, height: 260 }) },
+        setPointerCapture: () => {},
+        releasePointerCapture: () => {},
+    },
+});
+const titleBarOf = (node) => byAttribute(node, "data-dsh-skin-titlebar");
+const bar1 = titleBarOf(window);
+assert(typeof bar1.props.onPointerDown === "function" && typeof bar1.props.onPointerMove === "function", "the window title bar must drag, not only the panel's");
+bar1.props.onPointerDown(windowPointer(420, 170));
+bar1.props.onPointerMove(windowPointer(260, 470));
+bar1.props.onPointerUp(windowPointer(260, 470));
+window = render("window", plugin.ClassicWindow);
+equal(window.props.style.left, "240px", "dragging the title bar must move the window horizontally");
+equal(window.props.style.top, "460px", "dragging the title bar must move the window vertically");
+equal(window.props.style.transform, "none", "an explicit position must override the centred transform");
+const savedWindow = JSON.parse(storage.get("dsh.skin.win2000.window"));
+equal(savedWindow.x, 240, "the window position must be remembered");
+equal(savedWindow.y, 460, "the window position must be remembered on both axes");
+
+// A move past the viewport edge clamps instead of pushing the window off-screen.
+const bar2 = titleBarOf(window);
+bar2.props.onPointerDown(windowPointer(420, 170));
+bar2.props.onPointerMove(windowPointer(2400, 1700));
+bar2.props.onPointerUp(windowPointer(2400, 1700));
+window = render("window", plugin.ClassicWindow);
+equal(window.props.style.left, "860px", "the window must clamp to the viewport width (1280 - 420)");
+equal(window.props.style.top, "540px", "the window must clamp to the viewport height (800 - 260)");
+
+// Maximize and restore: the window fills the viewport, and restoring returns it to
+// the position it was dragged to instead of displacing it.
+const bar3 = titleBarOf(window);
+bar3.props.onDoubleClick();
+window = render("window", plugin.ClassicWindow);
+equal(window.props.style.left, "0px", "a title-bar double click must maximise, not recentre");
+equal(window.props.style.width, "auto", "a maximised window must stretch to the viewport");
+equal(find(window, (child) => child.props?.["aria-label"] === "还原").props["aria-pressed"], "true", "the title button must read as restore while maximised");
+
+// A drag gesture on a maximised window must not move it.
+const bar4 = titleBarOf(window);
+bar4.props.onPointerDown(windowPointer(420, 170));
+bar4.props.onPointerMove(windowPointer(200, 200));
+bar4.props.onPointerUp(windowPointer(200, 200));
+window = render("window", plugin.ClassicWindow);
+equal(window.props.style.left, "0px", "a maximised window must ignore drag attempts");
+
+titleBarOf(window).props.onDoubleClick();
+window = render("window", plugin.ClassicWindow);
+equal(window.props.style.left, "860px", "restoring must put the window back where it was dragged");
+equal(window.props.style.top, "540px", "restoring must keep both axes");
+
+find(window, (child) => child.props?.["data-dsh-skin-titlebtn"] === "max").props.onClick();
+window = render("window", plugin.ClassicWindow);
+equal(window.props.style.width, "auto", "the maximize button must maximise as well");
+find(window, (child) => child.props?.["data-dsh-skin-titlebtn"] === "max").props.onClick();
+window = render("window", plugin.ClassicWindow);
+equal(window.props.style.left, "860px", "the restore button must return to the dragged position");
+
 // ---- the settings panel -------------------------------------------------
 let panel = render("settings", plugin.SkinSettings);
 const rowLabels = panel.children.filter((child) => child?.type === "button").map((child) => child.children.at(-1));

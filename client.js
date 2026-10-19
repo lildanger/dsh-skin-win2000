@@ -634,19 +634,80 @@ body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"
          * minimize/maximize buttons) are driven by clicks, because a specimen
          * that cannot be focused has no real activation to follow.
          */
+        /** Where the specimen window was dragged; null keeps the centred CSS default. */
+        const WINDOW_KEY = "dsh.skin.win2000.window";
+        const readWindowPos = () => {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(WINDOW_KEY) ?? "null");
+                return Number.isFinite(parsed?.x) && Number.isFinite(parsed?.y)
+                    ? { x: parsed.x, y: parsed.y }
+                    : null;
+            } catch {
+                return null;
+            }
+        };
+        const writeWindowPos = (pos) => {
+            try {
+                if (pos === null) localStorage.removeItem(WINDOW_KEY);
+                else localStorage.setItem(WINDOW_KEY, JSON.stringify(pos));
+            } catch {
+                /* private mode: the window still moves, it just forgets */
+            }
+        };
+
         function ClassicWindow() {
             const [openMenu, setOpenMenu] = React.useState(null);
             const [inactive, setInactive] = React.useState(false);
             const [pressed, setPressed] = React.useState("");
             const [checked, setChecked] = React.useState(true);
             const [name, setName] = React.useState("DSH 皮肤示例");
+            const [pos, setPos] = React.useState(readWindowPos);
+            const [maxed, setMaxed] = React.useState(false);
+            const drag = React.useRef(null);
 
-            const titleButton = (id, glyph, label, onClick) => React.createElement("button", {
+            // The title bar drags the window anywhere in the viewport. The stylesheet
+            // centres it by default; once moved, an inline position takes over.
+            const onTitlePointerDown = (event) => {
+                if (maxed) return;
+                if (event.target.closest("[data-dsh-skin-titlebtn]") !== null) return;
+                const rect = event.currentTarget.parentElement.getBoundingClientRect();
+                drag.current = {
+                    dx: event.clientX - rect.left,
+                    dy: event.clientY - rect.top,
+                    width: rect.width || 420,
+                    height: rect.height || 240,
+                };
+                event.currentTarget.setPointerCapture(event.pointerId);
+            };
+            const onTitlePointerMove = (event) => {
+                if (drag.current === null) return;
+                const maxX = Math.max(0, (window.innerWidth || 1280) - drag.current.width);
+                const maxY = Math.max(0, (window.innerHeight || 800) - drag.current.height);
+                const next = {
+                    x: Math.min(Math.max(0, event.clientX - drag.current.dx), maxX),
+                    y: Math.min(Math.max(0, event.clientY - drag.current.dy), maxY),
+                };
+                drag.current.next = next;
+                setPos(next);
+            };
+            const onTitlePointerUp = (event) => {
+                if (drag.current === null) return;
+                const next = drag.current.next;
+                drag.current = null;
+                event.currentTarget.releasePointerCapture(event.pointerId);
+                if (next !== undefined) writeWindowPos(next);
+            };
+            // Windows 2000 maximises on a title-bar double click and on the maximize
+            // button; the window keeps its dragged position and returns to it when
+            // restored, so maximizing never displaces it.
+            const toggleMax = () => { setMaxed(!maxed); };
+
+            const titleButton = (id, glyph, label, onClick, active = pressed === id) => React.createElement("button", {
                 key: id,
                 type: "button",
                 "data-dsh-skin-titlebtn": id,
                 "aria-label": label,
-                "aria-pressed": pressed === id ? "true" : "false",
+                "aria-pressed": active ? "true" : "false",
                 onClick,
             }, glyph);
 
@@ -689,11 +750,22 @@ body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"
                 "data-dsh-skin-inactive": inactive ? "true" : "false",
                 role: "dialog",
                 "aria-label": "Windows 2000 窗口示例",
+                style: maxed
+                    ? { left: "0px", top: "0px", right: "0px", bottom: "0px", width: "auto", height: "auto", transform: "none" }
+                    : pos === null ? undefined : { left: pos.x + "px", top: pos.y + "px", transform: "none" },
             },
-            React.createElement("div", { "data-dsh-skin-titlebar": "" },
+            React.createElement("div", {
+                "data-dsh-skin-titlebar": "",
+                onPointerDown: onTitlePointerDown,
+                onPointerMove: onTitlePointerMove,
+                onPointerUp: onTitlePointerUp,
+                onPointerCancel: onTitlePointerUp,
+                onDoubleClick: toggleMax,
+                title: "拖动窗口，双击最大化或还原",
+            },
                 React.createElement("span", { "data-dsh-skin-titletext": "" }, "示例对话框"),
                 titleButton("min", "\u2013", "最小化", () => { setPressed(pressed === "min" ? "" : "min"); }),
-                titleButton("max", "\u25A1", "最大化", () => { setPressed(pressed === "max" ? "" : "max"); }),
+                titleButton("max", "\u25A1", maxed ? "还原" : "最大化", toggleMax, maxed),
                 titleButton("close", "\u00D7", "关闭", () => { setPressed(""); setInactive(true); })),
             menuBar,
             client,

@@ -89,10 +89,11 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 | `project()` | 投影到 DOM：`data-dsh-skin` / `-variant` / `-pixel` / `color-scheme` |
 | `PALETTES` / `MENUS` | 配色列表（死代码）、窗口示例的菜单数据 |
 | `SPEC` | **规范值常量表**，check 直接断言它 |
-| `ClassicWindow()` | 窗口示例（标题栏 + 三标题按钮 + 菜单栏 + 客户区 + 状态栏 + 操作行） |
+| `ClassicWindow()` | 窗口示例（标题栏 + 三标题按钮 + 菜单栏 + 客户区 + 状态栏 + 操作行）；标题栏可拖动、双击最大化/还原 |
+| `WINDOW_KEY` / `readWindowPos` / `writeWindowPos` | 窗口位置，存 `dsh.skin.win2000.window`（`{x,y}`；null 表示 CSS 默认居中） |
 | `UI_KEY` / `readUi` / `writeUi` | 面板位置与**档位**，存 `dsh.skin.win2000.ui` |
 | `SkinSettings()` | 右下角面板：可拖、**三档循环**（见第 6 节） |
-| `drag` / `dragged` ref | 拖动状态；`dragged` 用来吞掉拖动结束时浏览器补发的 click（坑 19） |
+| `drag` / `dragged` ref | 拖动状态；`dragged` 用来吞掉拖动结束时浏览器补发的 click（坑 19）；`ClassicWindow` 里另有一个同名 `drag` ref 管窗口拖动 |
 | `cycleStage()` | 档位 0→1→2→0 |
 | `inject = ["slots"]` | **必须导出**，否则 fiber 早于 slot 服务激活 |
 | `apply(ctx)` | 注入 `<style>`、应用设置、注册面板 |
@@ -156,12 +157,14 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 |---|---|
 | `dsh.skin.win2000` | `{ enabled, pixel }`；**两项都是默认值时不落盘** |
 | `dsh.skin.win2000.ui` | `{ x, y, stage }`——`x/y` 为 null 表示默认右下角；**`stage` 是三档**：0 完整面板 / 1 只剩标题栏 / 2 一个小 ＋。旧的 `folded:true` 会读成 stage 1 |
+| `dsh.skin.win2000.window` | `{ x, y }`——窗口示例拖到的视口坐标；键不存在 = CSS 默认（居中，`left:50%` + `translateX(-50%)`） |
 
 - **默认：皮肤开启 + 点阵字体开启**。
 - **面板三档循环**：标题栏右侧按钮点击循环 0→1→2→0；**最小档的小 ＋ 本身也是拖动把手**，拖动超过 3px 只记位置、**不换档**（坑 19）。
 - **双击标题栏**把面板位置重置回右下角。
+- **窗口示例**：标题栏按住即可拖到视口任意位置（pointer capture，和面板同一套手势），拖动时按窗口实际宽高夹在视口内；`pointerup` 才写 localStorage。**双击标题栏或点 `□`** 最大化 —— 内联 `left/top/right/bottom:0` + `width/height:auto` 铺满视口；再双击或再点一次还原，**回到原来拖到的坐标**，不会位移。最大化期间标题栏拖动被忽略，避免把铺满的窗口拖歪。
 - 关闭皮肤 = 移除三个属性、释放 `color-scheme`；面板与窗口因自包含而**保持 2000 外观**。
-- 卸载插件会移除 `<style>`、清属性、删两个 localStorage 键。
+- 卸载插件会移除 `<style>`、清属性、删设置键 `dsh.skin.win2000`；面板与窗口位置键保留，下次装回来还在原处。
 
 **为什么不注册主题**：DSH「设置 → 通用 → 外观」那一行写死 `light/dark/system`，第三方主题 id 进不去，皮肤因此自己驱动 `body` 属性。
 
@@ -214,13 +217,16 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 ```powershell
 cd D:\Desktop\fuck\DSH
 node --check client.js          # 语法
-node check.mjs                  # 250 条声明 / 规范值 / 字体约定 / 面板三档 / dispose
+node check.mjs                  # 250 条声明 / 规范值 / 字体约定 / 面板三档 / 窗口拖动与最大化 / dispose
 node check-host.mjs             # 宿主字体路由：供包内字体、404 未知、拒绝穿越
 node verify-metrics.mjs         # 对照度量表，纯白必须为 0
 node tools/probe-live-css.mjs   # 浏览器里核对注入后的样式表（需要 Chrome + DSH 在跑）
+node tools/probe-window-drag.mjs 3080   # CDP 真拖动窗口：位移、夹取、刷新记忆、双击最大化/还原
 ```
 
-`check.mjs` 覆盖：SPEC 常量逐值、样式表逐条（阴影三态、标题栏渐变、11px、无纯白、radius 归零、滚动条、面板/窗口规则、气泡、侧栏凹槽、定位标记排除、链接色）、字体约定、投影属性、**面板三档循环**（含"拖动后的 click 不换档"的真实指针流程）、窗口示例交互、dispose 清理。
+`check.mjs` 覆盖：SPEC 常量逐值、样式表逐条（阴影三态、标题栏渐变、11px、无纯白、radius 归零、滚动条、面板/窗口规则、气泡、侧栏凹槽、定位标记排除、链接色）、字体约定、投影属性、**面板三档循环**（含"拖动后的 click 不换档"的真实指针流程）、**窗口拖动 + 视口夹取 + 位置记忆 + 双击最大化/还原**、窗口示例交互、dispose 清理。
+
+`tools/probe-window-drag.mjs`：CDP 开无头 Chrome → 打开面板的「窗口示例」→ 真实鼠标事件拖动标题栏（请求 180/320，实测一致）→ 读内联坐标与 localStorage → 刷新后重开确认记忆 → 双击最大化（1424×805，正好等于视口）→ 再双击还原回 682,449。这是窗口放置行为唯一的端到端证据。
 
 `tools/probe-live-css.mjs`：CDP 开无头 Chrome → 等样式表注入 → **逐条比对 199 个带色值的 token**（另有 11 个值不是色值，如 `0px`、`none`）→ 报告缺失/不一致/槽位残留。**这是唯一能证明 token 真正生效的方法**（坑 17）。
 

@@ -48,7 +48,7 @@ It does not approximate the era — it takes its values from the era's metric ta
 - **No pure white** — the metric table's `#FFFFFF` ButtonHighlight becomes `#F5F5F5`, the white Window surface becomes `#D4D0C8`. The skin contains no pure-white pixel
 - **16px square scrollbar** — grey trough with a stippled track, raised thumb, sunken while dragging
 - **Stop is red** — Send and Stop share one button class, so the skin keys on `aria-label`; pausing turns the control a solid `#CC0000`
-- **The settings panel** — bottom-right, dragged by its title bar (position remembered), collapsible, with the skin switch, the palette choice and a classic window specimen
+- **The settings panel** — bottom-right, dragged by its title bar (position remembered), collapsible, with the skin switch, the palette choice and a classic window specimen; the specimen itself drags too, and a title-bar double click maximises or restores it
 - **Your typeface is left alone** — the skin sets no `font-family` anywhere except the Marlett symbol glyphs in the window title buttons. Font and size stay entirely under your DSH font settings
 - **No build step** — plain JavaScript, one file, refresh to apply
 
@@ -134,8 +134,11 @@ The panel in the bottom-right corner:
 | 启用皮肤 (Enable skin) | Toggles the skin. Switching it off restores DSH exactly as it was, while the panel keeps its 2000 chrome so you can switch back |
 | 点阵字体 (Bitmap font) | Toggles the bitmap face that ships with the package; switch it off and your own font settings apply |
 | 窗口示例 (Window specimen) | Opens a fully reproduced classic dialog: title bar with the three title buttons, menu bar, sunken client area, three-panel status bar and an action row. Click `×` to see the inactive gradient |
+| The window itself | Drag its title bar anywhere in the viewport; the spot is remembered under `dsh.skin.win2000.window`. **Double-click** the title bar or press `□` to maximise it to the viewport, and again to restore — restoring returns to the exact spot it was dragged to |
 
 The small plus in the last stage is draggable as well — it is the only thing left to grab once the panel is put away, and dragging it never opens the panel by accident.
+
+The window keeps its own storage key, separate from the panel's, and a maximised window ignores drag gestures so it cannot be pulled away by accident.
 
 ## Palette
 
