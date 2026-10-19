@@ -129,7 +129,7 @@ The panel in the bottom-right corner:
 
 | Control | What it does |
 |---|---|
-| Title bar | Drag the whole panel anywhere; the position is remembered in localStorage. **Double-click** to send it back to the corner |
+| Title bar | Drag the whole panel anywhere — it can sit flush against the right or bottom screen edge; the position is remembered in localStorage. **Double-click** to send it back to the corner |
 | Button at the right | **Three stages, cycled**: full panel → title bar only → a single small plus → back to the full panel. That button **stays where the mouse clicked it**, and the panel grows and shrinks around it |
 | 启用皮肤 (Enable skin) | Toggles the skin. Switching it off restores DSH exactly as it was, while the panel keeps its 2000 chrome so you can switch back |
 | 点阵字体 (Bitmap font) | Toggles the bitmap face that ships with the package; switch it off and your own font settings apply |

@@ -881,8 +881,10 @@ body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"
                 w: typeof window !== "undefined" && window.innerWidth ? window.innerWidth : 1280,
                 h: typeof window !== "undefined" && window.innerHeight ? window.innerHeight : 800,
             });
-            const clampLeft = (value, width) => Math.max(8, Math.min(value, viewport().w - width - 8));
-            const clampTop = (value, height) => Math.max(8, Math.min(value, viewport().h - height - 8));
+            // Left and top keep an 8px grab margin; right and bottom are flush, so the
+            // panel can be parked against the screen edge like a real Windows window.
+            const clampLeft = (value, width) => Math.max(8, Math.min(value, viewport().w - width));
+            const clampTop = (value, height) => Math.max(8, Math.min(value, viewport().h - height));
             let safeX = ui.x;
             let safeY = ui.y;
             if (safeX !== null) safeX = clampLeft(safeX, sizeRef.current.w);
