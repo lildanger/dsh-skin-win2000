@@ -51,6 +51,10 @@ const specificity = (selector) => {
     return ids * 10000 + classes * 100 + types;
 };
 const equal = (actual, expected, what) => assert(actual === expected, `${what}\n  expected: ${expected}\n  actual:   ${actual}`);
+const hexLightness = (hex) => {
+    const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+    return (Math.max(r, g, b) + Math.min(r, g, b)) / 2;
+};
 
 /**
  * State harness: every component instance owns its own state array, and a
@@ -251,10 +255,34 @@ const scrollbarRule = css.split(String.fromCharCode(10)).find((line) => line.inc
 assert(scrollbarRule !== undefined, "the scrollbar parts need their own rule: `*` never reaches pseudo-elements");
 assert(scrollbarRule.includes("border-radius:0 !important"), "the scrollbar parts must be square");
 assert(css.includes("[data-dsh-skin-window]"), "the specimen window must be styled by the same sheet");
-const tokenCount = [...css.matchAll(/--dsw-[a-z0-9-]+:/g)].length;
+// The dark block re-declares the palette, so count the light sheet separately.
+const darkStart = css.indexOf("/* Dark mode keeps the geometry");
+assert(darkStart > 0, "the dark block must sit after the light rules");
+const lightCss = css.slice(0, darkStart);
+const tokenCount = [...lightCss.matchAll(/--dsw-[a-z0-9-]+:/g)].length;
 equal(tokenCount, 250, "token declarations: the Windows 2000 palette, the static ramp and the six radius tokens");
-const shikiCount = [...css.matchAll(/--shiki-[a-z-]+:/g)].length;
+const tokenDeclarations = [...css.matchAll(/--dsw-[a-z0-9-]+:/g)].length;
+assert(tokenDeclarations > tokenCount, "the dark block must re-declare the palette under its own attribute");
+assert(css.includes('body[data-dsh-skin="win2000"][data-dsh-skin-dark]{'), "dark mode must key on its own body attribute");
+assert(css.includes("--dsh-skin-shadow-raised:inset 1px 1px 0 var(--dsh-dark-light)"), "dark bevels must keep the light-from-upper-left direction");
+assert(css.includes("--dsh-skin-shadow-sunken:inset 1px 1px 0 var(--dsh-dark-shadow)"), "dark sunken fields must invert the same way");
+// Every dark chrome colour is a step of one derived ladder: the raised bevel keeps the
+// light palette's spacing, shadows are a fraction of the surface, and the surface
+// itself lands a shade above black rather than at black or mid grey.
+const darkScale = Object.fromEntries(
+    [...css.matchAll(/--dsh-dark-([a-z-]+):#([0-9A-F]{6})/g)].map(([, name, value]) => [name, hexLightness(value)]),
+);
+assert(darkScale.light > darkScale.face && darkScale.face > darkScale.surface, "dark bevels must step upward from the surface, as the light chrome does");
+assert(darkScale.surface > darkScale.shadow && darkScale.shadow > 0, "dark shadows must stay below the surface and above black");
+assert(darkScale.surface > 0.06 && darkScale.surface < 0.14, "the dark surface must land a shade above black, not at black or mid grey");
+assert(Math.abs(darkScale.card - darkScale.surface) < 0.05, "the card surface must track the mirrored panel tokens, not drift off on its own");
+const darkTokens = [...css.matchAll(/--dsw-[a-z0-9-]+:#[0-9A-Fa-f]{6}/g)].length;
+assert(darkTokens > 180, "the dark block must repaint the colour tokens, not inherit the light ones");
+assert(css.includes("[data-dsh-skin-panel] > button[aria-pressed=\"true\"] span[data-dsh-skin-mark]"), "the dark check mark must stay visible");
+const shikiCount = [...lightCss.matchAll(/--shiki-[a-z-]+:/g)].length;
 equal(shikiCount, 11, "syntax colours must be re-tuned for the deep grey code surface");
+const darkShiki = [...css.slice(darkStart).matchAll(/--shiki-[a-z-]+:/g)].length;
+assert(darkShiki >= 11, "the dark block must repaint the syntax colours too");
 assert(css.includes("--shiki-background:#C8C4BC"), "the syntax background must match the code surface");
 assert(css.includes("--dsw-static-neutral-00:#EDEDED !important"), "the static ramp may not fall back to white");
 assert(css.includes("--dsw-linear-gradient-think:linear-gradient(180deg,#D4D0C8"), "the reasoning wash must be repainted");
@@ -387,7 +415,7 @@ equal(window.props.style.left, "860px", "the restore button must return to the d
 // ---- the settings panel -------------------------------------------------
 let panel = render("settings", plugin.SkinSettings);
 const rowLabels = panel.children.filter((child) => child?.type === "button").map((child) => child.children.at(-1));
-equal(rowLabels.join("|"), "启用皮肤|点阵字体|窗口示例", "settings panel rows");
+equal(rowLabels.join("|"), "启用皮肤|点阵字体|暗色模式|窗口示例", "settings panel rows");
 
 /** Find a panel row by its label — the separators shift raw indices. */
 const row = (node, label) => {
@@ -403,6 +431,21 @@ panel = render("settings", plugin.SkinSettings);
 assert(row(panel, "点阵字体").props["aria-pressed"] === "false", "the pixel row must read as unselected while off");
 row(panel, "点阵字体").props.onClick();
 equal(body.getAttribute("data-dsh-skin-pixel"), "unsciicjkv", "turning the pixel face back on must restore it");
+
+// Dark mode: off unless asked for, and it owns its own attribute plus the
+// color scheme, so native form controls and scrollbars follow.
+equal(body.getAttribute("data-dsh-skin-dark"), null, "dark mode must start off");
+panel = render("settings", plugin.SkinSettings);
+row(panel, "暗色模式").props.onClick();
+equal(body.getAttribute("data-dsh-skin-dark"), "win2000", "the dark row must flag the document");
+equal(attributes.get("color-scheme"), "dark", "dark mode must pin the dark color scheme");
+equal(JSON.parse(storage.get("dsh.skin.win2000")).dark, true, "dark mode must be remembered");
+panel = render("settings", plugin.SkinSettings);
+assert(row(panel, "暗色模式").props["aria-pressed"] === "true", "the dark row must read as selected while on");
+row(panel, "暗色模式").props.onClick();
+equal(body.getAttribute("data-dsh-skin-dark"), null, "turning dark off must clear the attribute");
+equal(attributes.get("color-scheme"), "light", "turning dark off must return to the light scheme");
+equal(storage.get("dsh.skin.win2000"), undefined, "the default light state must leave no settings behind");
 
 // The code face is not adjustable: it follows the interface face, and the
 // panel must not grow a selector for it again.

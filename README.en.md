@@ -32,6 +32,10 @@ Classic grey controls, two-tone gradient title bars, 1px bevels, hard square cor
 
 ![Settings](docs/screenshots/03-settings.png)
 
+### Dark mode — the same metrics and bevels on a dark paint, switched from the panel
+
+![Dark mode](docs/screenshots/04-dark.png)
+
 ---
 
 ## What this is
@@ -48,7 +52,8 @@ It does not approximate the era — it takes its values from the era's metric ta
 - **No pure white** — the metric table's `#FFFFFF` ButtonHighlight becomes `#F5F5F5`, the white Window surface becomes `#D4D0C8`. The skin contains no pure-white pixel
 - **16px square scrollbar** — grey trough with a stippled track, raised thumb, sunken while dragging
 - **Stop is red** — Send and Stop share one button class, so the skin keys on `aria-label`; pausing turns the control a solid `#CC0000`
-- **The settings panel** — bottom-right, dragged by its title bar (position remembered), collapsible, with the skin switch, the palette choice and a classic window specimen; the specimen itself drags too, and a title-bar double click maximises or restores it
+- **The settings panel** — bottom-right, dragged by its title bar (position remembered), collapsible, with the skin switch, the palette choice, the dark-mode switch and a classic window specimen; the specimen itself drags too, and a title-bar double click maximises or restores it
+- **Dark mode (off by default)** — one row in the panel. Same geometry, same bevels, only the paint changes: surfaces drop to a warm `#1A1815` - one step above pure black, the exact mirror of the light surface - sunken fields to `#090909`, cards to `#201E1A`, while the title-bar gradient, the navy selection and the three-step shading all stay. `color-scheme` flips to `dark` so native controls and scrollbars follow
 - **Your typeface is left alone** — the skin sets no `font-family` anywhere except the Marlett symbol glyphs in the window title buttons. Font and size stay entirely under your DSH font settings
 - **No build step** — plain JavaScript, one file, refresh to apply
 
@@ -133,6 +138,7 @@ The panel in the bottom-right corner:
 | Button at the right | **Three stages, cycled**: full panel → title bar only → a single small plus → back to the full panel. That button **stays where the mouse clicked it**, and the panel grows and shrinks around it |
 | 启用皮肤 (Enable skin) | Toggles the skin. Switching it off restores DSH exactly as it was, while the panel keeps its 2000 chrome so you can switch back |
 | 点阵字体 (Bitmap font) | Toggles the bitmap face that ships with the package; switch it off and your own font settings apply |
+| 暗色模式 (Dark mode) | Switches the dark paint; **off by default**. Colours only, never geometry: surfaces `#1A1815`, sunken controls `#090909`, cards `#201E1A`, while the title-bar gradient, the navy selection and the bevels stay unchanged. Stored in `dsh.skin.win2000` alongside the bitmap-font choice |
 | 窗口示例 (Window specimen) | Opens a fully reproduced classic dialog: title bar with the three title buttons, menu bar, sunken client area, three-panel status bar and an action row. Click `×` to see the inactive gradient |
 | The window itself | Drag its title bar anywhere in the viewport; the spot is remembered under `dsh.skin.win2000.window`. **Double-click** the title bar or press `□` to maximise it to the viewport, and again to restore — restoring returns to the exact spot it was dragged to |
 
@@ -174,7 +180,7 @@ node verify-metrics.mjs  # the Windows 2000 metric table; pure white must be 0
 - **11px is global** — it is part of the metric table, so body text and code blocks drop to 11px along with the controls.
 - **`-webkit-font-smoothing: none` does nothing on Windows Chromium** (it renders through DirectWrite). It is declared, but it cannot change the rendering there.
 - **Square corners are indiscriminate** — avatars, status dots and switch knobs all become squares. To keep circles, exclude them from the `border-radius:0 !important` selector.
-- **The screenshots are captures** — the three PNGs are taken from a running interface by `tools/capture.mjs` over the Chrome DevTools Protocol, with the skin mounted (`data-dsh-skin="win2000"`). The capture machine uses this author's bitmap-font and palette settings, so type rendering follows those settings.
+- **The screenshots are captures** — the four PNGs are taken from a running interface by `tools/capture.mjs` over the Chrome DevTools Protocol, with the skin mounted (`data-dsh-skin="win2000"`); the fourth is captured after switching dark mode on in the panel. The capture machine uses this author's bitmap-font and palette settings, so type rendering follows those settings.
 
 ## Development
 
@@ -195,7 +201,7 @@ dsh-skin-win2000/            ← the repository root IS the package
 ├── fonts/unsciiCJKV18.woff2 the bundled bitmap face (1.42 MB, WOFF2)
 ├── fonts/README.md          the face's provenance, format and GPL notes
 ├── fonts/COPYING            the GPL text
-├── docs/screenshots/        the three captured PNGs
+├── docs/screenshots/        the four captured PNGs
 ├── README.md                the Chinese introduction (the default)
 ├── HANDOFF.md               handoff notes: structure, pitfalls, release rules
 ├── LICENSE                  MIT (the skin itself)

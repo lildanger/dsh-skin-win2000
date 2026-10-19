@@ -3,7 +3,7 @@
 DSH Web GUI 的 Windows 2000 皮肤插件。单文件客户端 bundle，无构建步骤。
 
 **仓库**：<https://github.com/lildanger/dsh-skin-win2000>（public）
-**npm**：<https://www.npmjs.com/package/dsh-skin-win2000>（当前 `1.0.1`）
+**npm**：<https://www.npmjs.com/package/dsh-skin-win2000>（当前 `1.3.0`）
 
 ---
 
@@ -40,7 +40,7 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 │   ├── unsciiCJKV18.woff2 随包分发的点阵字体（1.42 MB，许可见该目录 README）
 │   ├── COPYING            GPL 全文（字体衍生自 unscii-16-full）
 │   └── README.md          来源、许可、格式与移除方法
-├── docs/screenshots/     三张实机截图（tools/capture.mjs 生成）
+├── docs/screenshots/     四张实机截图（tools/capture.mjs 生成，第四张是暗色）
 ├── tools/
 │   ├── capture.mjs       用 CDP 抓真实界面截图
 │   ├── probe-live-css.mjs 核对注入后的样式表（199 个带色值 token）
@@ -82,11 +82,13 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 | `React` / `SKIN_ATTRIBUTE` / `SKIN_VALUE` / `STORAGE_KEY` / `PIXEL_VALUE` | 皮肤属性 `data-dsh-skin="win2000"`、点阵属性值 |
 | `WIN2000_TOKENS` | 主配色表（**210 个 token**；另有 `LUNA_TOKENS` 50 个覆盖，合计 260 个定义行） |
 | `LUNA_TOKENS` | 变体差异表 |
+| `toHsl()` / `fromHsl()` / `mirrorColor()` / `darkValue()` / `DARK_TOKENS` | 暗色表：把每个**色值** token 的亮度镜像（HSL 里 `L→1-L`，钳到 `0.09–0.92`，H/S 不动），非色值 token 原样返回（见坑 37） |
+| `chromeStep()` / `shadeStep()` / `tintStep()` / `DARK_SCALE` / `DARK_VARS` | 暗色手写层用的一套阶梯：`chromeStep` 保亮色的立体方向，`shadeStep` 取表面的固定比例当阴影，`tintStep` 抬亮度做弱化文字；`DARK_VARS` 经 `@@DARKVARS@@` 槽位落成 `--dsh-dark-*` 变量（4.1 节） |
 | `declarations()` | 把 token 表摊平成 `--x:#y !important;…` |
-| `TOKEN_SLOT` / `LUNA_SLOT` / `buildStylesheet()` | 运行时把 token 注入样式表（坑 2、坑 17） |
-| `STYLESHEET` | 全部 CSS 规则（含 `@font-face` 与点阵字体规则） |
-| `readSettings` / `writeSettings` | `enabled` + `pixel`，存 `dsh.skin.win2000` |
-| `project()` | 投影到 DOM：`data-dsh-skin` / `-variant` / `-pixel` / `color-scheme` |
+| `TOKEN_SLOT` / `LUNA_SLOT` / `DARK_SLOT` / `DARK_VAR_SLOT` / `buildStylesheet()` | 运行时把三张 token 表和暗色阶梯注入样式表（坑 2、坑 17） |
+| `STYLESHEET` | 全部 CSS 规则（含 `@font-face`、点阵字体规则和暗色字面量层） |
+| `readSettings` / `writeSettings` | `enabled` + `pixel` + `dark`，存 `dsh.skin.win2000`；**三项都是默认值时删键** |
+| `project()` | 投影到 DOM：`data-dsh-skin` / `-variant` / `-pixel` / `-dark` / `color-scheme`（暗色时 `dark`） |
 | `PALETTES` / `MENUS` | 配色列表（死代码）、窗口示例的菜单数据 |
 | `SPEC` | **规范值常量表**，check 直接断言它 |
 | `ClassicWindow()` | 窗口示例（标题栏 + 三标题按钮 + 菜单栏 + 客户区 + 状态栏 + 操作行）；标题栏可拖动、双击最大化/还原 |
@@ -127,6 +129,23 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 `--window-frame:#0a0a0a`、`--dialog-blue:#000080`、`--dialog-blue-light:#1084d0`、`--link-blue:#0000ff`。
 皮肤用的是同一套 bevel 关系，只把纯白换成 `#F5F5F5`。
 
+### 4.1 暗色层（`data-dsh-skin-dark`，默认关闭）
+
+暗色不做第二套设计，而是**同一张表的亮度镜像**：`DARK_TOKENS` 由 `WIN2000_TOKENS` 逐项算出来（色值在 HSL 里 `L→1-L`，钳在 `0.09–0.92`，色相/饱和度不动），命中 199 个色值 token；`0px`、`none` 之类原样保留。镜像后的表面落在 `#1A1815`——比纯黑亮一档，正好是亮色 `#D4D0C8` 的镜像亮度。
+
+手写规则里的字面量颜色不再各写各的，而是从同一个阶梯里取（`DARK_SCALE`，由 `mirrorColor` / `chromeStep` / `shadeStep` / `tintStep` 算出来，经 `@@DARKVARS@@` 槽位落成 CSS 变量），规则里只写 `var(--dsh-dark-*)`：
+
+| 阶梯（变量） | 值 | 取法 |
+|---|---|---|
+| `--dsh-dark-surface` | `#1A1815` | 亮色表面 `#D4D0C8` 的镜像 |
+| `--dsh-dark-card` / `--dsh-dark-fill` | `#201E1A` / `#25231F` | 同一镜像规则，所以和 token 驱动的侧栏、代码块**落在同一个值上** |
+| `--dsh-dark-face` / `--dsh-dark-light` | `#2B2823` / `#413C34` | `chromeStep`：保留亮色里"亮面比表面高多少"，方向不变 |
+| `--dsh-dark-shadow` / `--dsh-dark-pressed` | `#0C0B09` / `#100E0C` | `shadeStep`：表面的固定比例，不是绝对黑 |
+| `--dsh-dark-paper` | `#090909` | 凹陷纸面（输入框、代码底）直接镜像 |
+| `--dsh-dark-muted` | `#7D7365` | 表面亮度 +0.35，禁用行用 |
+
+一句话：**漆面镜像、立体边框保方向、阴影按表面比例、纸面翻到底**。标题栏渐变、深蓝选中、`#000000` 最深边在两边都不变；暗色层同样必须给面板与窗口再写一遍规则（坑 4），否则关掉皮肤时自包含的外观会被暗色层污染。`tests` 里 `check.mjs` 会按这个阶梯断言顺序：`light > face > surface`、`surface > shadow > 0`、`card` 不能偏离 `surface` 超过 0.05 亮度。
+
 ---
 
 ## 5. CSS 规则要点
@@ -148,6 +167,7 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 | `@font-face{font-family:"unsciiCJKV18";src:url(…),local(…)}` | 包内字体优先，本机同名字体仅兜底 |
 | `body[…][data-dsh-skin-pixel] :is(…)` | **主字体**：点阵开关打开时接管全局；`16px` / `line-height:1.25` / `font-synthesis:none` / **`text-rendering:optimizeSpeed`**（点阵字吸附整数像素的命脉，坑 15） |
 | `:is(strong,b){text-shadow:1px 0 0 currentColor}` | 粗体用 1px 整数位移叠印，而非合成描边（坑 13） |
+| `body[…][data-dsh-skin-dark]{@@DARK@@}` + 末尾字面量层 | 暗色：镜像 token 表 + 重写字面量规则（4.1 节、坑 37） |
 
 ---
 
@@ -155,15 +175,16 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 
 | key | 内容 |
 |---|---|
-| `dsh.skin.win2000` | `{ enabled, pixel }`；**两项都是默认值时不落盘** |
+| `dsh.skin.win2000` | `{ enabled, pixel, dark }`；**三项都是默认值时不落盘**（`dark` 默认 `false`） |
 | `dsh.skin.win2000.ui` | `{ x, y, stage }`——`x/y` 为 null 表示默认右下角；**`stage` 是三档**：0 完整面板 / 1 只剩标题栏 / 2 一个小 ＋。旧的 `folded:true` 会读成 stage 1 |
 | `dsh.skin.win2000.window` | `{ x, y }`——窗口示例拖到的视口坐标；键不存在 = CSS 默认（居中，`left:50%` + `translateX(-50%)`） |
 
-- **默认：皮肤开启 + 点阵字体开启**。
+- **默认：皮肤开启 + 点阵字体开启 + 暗色关闭**。
+- **暗色模式**：面板里一行开关，只切 `data-dsh-skin-dark` 与 `color-scheme`。位置、档位、字体都不受影响；关皮肤时四个属性一起移除。
 - **面板三档循环**：标题栏右侧按钮点击循环 0→1→2→0；**最小档的小 ＋ 本身也是拖动把手**，拖动超过 3px 只记位置、**不换档**（坑 19）。换档时以**点击处的鼠标坐标**为准：`requestAnimationFrame` 里量出新档按钮的中心，反推面板 `x/y` 写回，所以不管怎么缩，开关都停在点击的位置（坑 36）。拖动钳制：左/上留 8px 抓取余量，**右/下允许贴到屏幕边缘（0px）**，`tools/probe-edge.mjs` 实测面板与窗口示例的右边缘都能到 `innerWidth`。
 - **双击标题栏**把面板位置重置回右下角。
 - **窗口示例**：标题栏按住即可拖到视口任意位置（pointer capture，和面板同一套手势），拖动时按窗口实际宽高夹在视口内；`pointerup` 才写 localStorage。**双击标题栏或点 `□`** 最大化 —— 内联 `left/top/right/bottom:0` + `width/height:auto` 铺满视口；再双击或再点一次还原，**回到原来拖到的坐标**，不会位移。最大化期间标题栏拖动被忽略，避免把铺满的窗口拖歪。
-- 关闭皮肤 = 移除三个属性、释放 `color-scheme`；面板与窗口因自包含而**保持 2000 外观**。
+- 关闭皮肤 = 移除四个属性、释放 `color-scheme`；面板与窗口因自包含而**保持 2000 外观**。
 - 卸载插件会移除 `<style>`、清属性、删设置键 `dsh.skin.win2000`；面板与窗口位置键保留，下次装回来还在原处。
 
 **为什么不注册主题**：DSH「设置 → 通用 → 外观」那一行写死 `light/dark/system`，第三方主题 id 进不去，皮肤因此自己驱动 `body` 属性。
@@ -210,6 +231,7 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 | 33 | `git add -A` 把提交消息文件卷进仓库 | 消息写在仓库内的临时 `.txt`，`add -A` 一并暂存。**已踩两次** | 消息文件写进 `$env:TEMP`，或把文件名加进 `.gitignore` |
 | 36 | **面板换档后档位自己跳回去、面板莫名上移** | 换档后 `requestAnimationFrame` 里的回调闭包捕获的是**点击前那次渲染**的 `ui`，其中 `chrome({x,y})` 展开旧 `ui`，把刚写入的 `stage` 又写回旧值；视口钳制同时按写死的 240px 估面板高度，展开时把面板顶到上面 | 用 `uiRef` 保存最新 `ui` 再合并；面板宽高一律用 `getBoundingClientRect()` 实测后再钳制。验证脚本 `tools/probe-panel-fold.mjs` 在真实界面里连点三次，断言按钮中心偏移 ≤2px |
 | 24 | PowerShell 吃掉/误解脚本内容 | here-string 里的反引号、引号、`!` 会被解析 | **用 `write` 工具写脚本文件**，再 `node 脚本` 执行；提交消息用 `git commit -F 文件` |
+| 37 | **暗色模式下某些地方还是亮底 / token 没变** | ① 暗色 token 块最初放在 light token 块旁边，`check.mjs` 按"暗色注释之前"切亮色表时把暗色声明算进了亮色计数；② 字面量颜色（立体边框、滚动条贴图、面板/窗口）不读 token，只镜像 token 改不到它们 | ① 三张 token 表全部放在样式表末尾的暗色注释之后，亮色计数只切注释之前；② 字面量规则在末尾再写一层，选择器带 `[data-dsh-skin-dark]`，立体边框换成 `--dsh-skin-shadow-*` 的暗色值（方向不变） |
 
 ---
 
@@ -218,14 +240,20 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 ```powershell
 cd D:\Desktop\fuck\DSH
 node --check client.js          # 语法
-node check.mjs                  # 250 条声明 / 规范值 / 字体约定 / 面板三档 / 窗口拖动与最大化 / dispose
+node check.mjs                  # 250 条亮色声明 / 规范值 / 字体约定 / 暗色层 / 面板三档 / 窗口拖动与最大化 / dispose
 node check-host.mjs             # 宿主字体路由：供包内字体、404 未知、拒绝穿越
 node verify-metrics.mjs         # 对照度量表，纯白必须为 0
 node tools/probe-live-css.mjs   # 浏览器里核对注入后的样式表（需要 Chrome + DSH 在跑）
 node tools/probe-window-drag.mjs 3080   # CDP 真拖动窗口：位移、夹取、刷新记忆、双击最大化/还原
+node tools/probe-dark.mjs 3080  # CDP 实测暗色：切开关后逐项读 computed 颜色 + 阶梯值 + 亮底残留计数 + 截图
+node tools/probe-dark-settings.mjs 3080  # CDP 实测设置页暗色：黑字压暗底计数必须为 0，当前导航行必须是深蓝
 ```
 
-`check.mjs` 覆盖：SPEC 常量逐值、样式表逐条（阴影三态、标题栏渐变、11px、无纯白、radius 归零、滚动条、面板/窗口规则、气泡、侧栏凹槽、定位标记排除、链接色）、字体约定、投影属性、**面板三档循环**（含"拖动后的 click 不换档"的真实指针流程）、**窗口拖动 + 视口夹取 + 位置记忆 + 双击最大化/还原**、窗口示例交互、dispose 清理。
+`tools/probe-dark-settings.mjs` 用快捷键（Ctrl+Alt+`,`，页面内派发 `KeyboardEvent`）打开设置页——点侧栏「设置」入口依赖当时停在哪个界面，探索版探针曾因此误点进别的页面；设置页从 `更多` 菜单也进不去。
+
+`check.mjs` 覆盖：SPEC 常量逐值、样式表逐条（阴影三态、标题栏渐变、11px、无纯白、radius 归零、滚动条、面板/窗口规则、气泡、侧栏凹槽、定位标记排除、链接色）、字体约定、投影属性、**暗色层**（自带属性、暗色立体边框方向、重新声明 ≥180 个色值 token、勾选标记可见）、**面板三档循环**（含"拖动后的 click 不换档"的真实指针流程）、**窗口拖动 + 视口夹取 + 位置记忆 + 双击最大化/还原**、**暗色开关的落盘与属性投影**、窗口示例交互、dispose 清理。
+
+`tools/probe-dark.mjs`：CDP 开无头 Chrome → 读亮色 computed → 点面板「暗色模式」→ 复核 body/侧栏/卡片/面板/菜单/状态栏/窗口示例/输入框的 computed 颜色 → 统计仍渲染 `rgb(212,208,200)` 的元素个数（必须为 0）→ 打开会话确认真实代码块与工具行 → 三张截图（`workspace/dark-mode.png`、`dark-window.png`、`dark-chat.png`）。
 
 `tools/probe-window-drag.mjs`：CDP 开无头 Chrome → 打开面板的「窗口示例」→ 真实鼠标事件拖动标题栏（请求 180/320，实测一致）→ 读内联坐标与 localStorage → 刷新后重开确认记忆 → 双击最大化（1424×805，正好等于视口）→ 再双击还原回 682,449。这是窗口放置行为唯一的端到端证据。
 

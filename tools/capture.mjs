@@ -161,6 +161,21 @@ await send("Runtime.evaluate", {
 await sleep(4000);
 await shot("03-settings.png");
 
+// Fourth shot: the same surfaces repainted by the dark palette. The switch lives in
+// the panel, so the panel is what toggles it.
+await send("Runtime.evaluate", {
+    expression: `(() => {
+        const rows = [...document.querySelectorAll('[data-dsh-skin-panel] > button')];
+        const row = rows.find((b) => b.textContent.trim().endsWith('暗色模式'));
+        if (row) row.click();
+        return row ? 'dark on' : 'dark row not found';
+    })()`,
+    returnByValue: true,
+}, sessionId);
+await waitFor("document.body.getAttribute('data-dsh-skin-dark') !== null", 10000, "dark mode");
+await sleep(1500);
+await shot("04-dark.png");
+
 ws.close();
 chrome.kill();
 console.log("完成，输出目录: " + OUT);

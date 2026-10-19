@@ -340,6 +340,107 @@ window.__ModuleLoader__.load({
             "--dsw-specific-bubble-highlight": "#DCE6F5",
         };
 
+        /**
+         * The dark palette is derived, not written out: mirroring each colour's
+         * lightness keeps every token's job — surfaces sink, labels lift, the
+         * static ramps flip end for end — so no pair drifts apart. The dark half
+         * of that mirror is then compressed by half, so surfaces settle just
+         * above pure black ("a shade brighter than black") while labels stay
+         * near white. Mask scrims keep their values because they sit over media
+         * rather than over the chrome.
+         */
+        const toHsl = (hex) => {
+            const channels = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+            const max = Math.max(...channels);
+            const min = Math.min(...channels);
+            const light = (max + min) / 2;
+            const span = max - min;
+            const saturation = span === 0 ? 0 : span / (1 - Math.abs(2 * light - 1));
+            let hue = 0;
+            if (span !== 0) {
+                const [r, g, b] = channels;
+                if (max === r) hue = ((g - b) / span + (g < b ? 6 : 0)) / 6;
+                else if (max === g) hue = ((b - r) / span + 2) / 6;
+                else hue = ((r - g) / span + 4) / 6;
+            }
+            return { hue, saturation, light };
+        };
+        const fromHsl = ({ hue, saturation, light }) => {
+            const upper = light < 0.5 ? light * (1 + saturation) : light + saturation - light * saturation;
+            const lower = 2 * light - upper;
+            const channel = (offset) => {
+                let t = hue + offset;
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                let value;
+                if (t < 1 / 6) value = lower + (upper - lower) * 6 * t;
+                else if (t < 1 / 2) value = upper;
+                else if (t < 2 / 3) value = lower + (upper - lower) * (2 / 3 - t) * 6;
+                else value = lower;
+                return Math.round(Math.min(Math.max(value, 0), 1) * 255).toString(16).padStart(2, "0");
+            };
+            return (channel(1 / 3) + channel(0) + channel(-1 / 3)).toUpperCase();
+        };
+        const mirrorColor = (hex) => {
+            const { hue, saturation, light } = toHsl(hex);
+            const mirrored = 1 - light;
+            return fromHsl({
+                hue,
+                saturation,
+                light: mirrored < 0.5 ? mirrored * 0.48 : 0.5 + (mirrored - 0.5) * 0.86,
+            });
+        };
+
+        /** One rule for the whole dark palette: paint mirrors, bevels keep their
+         *  direction.
+         *  - surfaces mirror, exactly like the token block, so a panel painted from a
+         *    token and a panel painted from this sheet land on the same value;
+         *  - a raised face still sits one light-palette step above the surface and its
+         *    edges keep the light-from-upper-left direction, because inverting them
+         *    would turn every button into a hole;
+         *  - shadows are a fraction of the surface rather than absolute black, and
+         *    "paper" roles (fields, code surfaces) flip outright.
+         *  The mirrored surface lands about a tenth of the way up from black. */
+        const DARK_BASE = toHsl(mirrorColor("D4D0C8"));
+        const LIGHT_BASE = toHsl("D4D0C8").light;
+        const chromeStep = (hex) => fromHsl({
+            hue: DARK_BASE.hue,
+            saturation: DARK_BASE.saturation,
+            light: Math.min(Math.max(DARK_BASE.light + (toHsl(hex).light - LIGHT_BASE) * 0.9, 0), 1),
+        });
+        const shadeStep = (fraction) => fromHsl({
+            hue: DARK_BASE.hue,
+            saturation: DARK_BASE.saturation,
+            light: DARK_BASE.light * fraction,
+        });
+        const tintStep = (amount) => fromHsl({
+            hue: DARK_BASE.hue,
+            saturation: DARK_BASE.saturation,
+            light: Math.min(DARK_BASE.light + amount, 1),
+        });
+        const DARK_SCALE = {
+            surface: mirrorColor("D4D0C8"),
+            face: chromeStep("DFDFDF"),
+            light: chromeStep("F5F5F5"),
+            card: mirrorColor("C8C4BC"),
+            fill: mirrorColor("BFBBB2"),
+            fillHover: mirrorColor("B4B0A7"),
+            bubble: mirrorColor("FFFFE1"),
+            shadow: shadeStep(0.45),
+            pressed: shadeStep(0.62),
+            paper: mirrorColor("EDEDED"),
+            muted: tintStep(0.35),
+        };
+        const DARK_VARS = Object.entries(DARK_SCALE)
+            .map(([name, value]) => `--dsh-dark-${name}:#${value}`)
+            .join(";");
+        const darkValue = (name, value) => /mask/.test(name)
+            ? value
+            : value.replace(/#([0-9a-f]{6})([0-9a-f]{2})?/gi, (whole, rgb, alpha) => "#" + mirrorColor(rgb) + (alpha ?? ""));
+        const DARK_TOKENS = Object.fromEntries(
+            Object.entries(WIN2000_TOKENS).map(([name, value]) => [name, darkValue(name, value)]),
+        );
+
         /** Flatten a palette into declarations; `!important` defends it against
          *  the theme presenter's body inline tokens. */
         const declarations = (tokens) =>
@@ -352,9 +453,13 @@ window.__ModuleLoader__.load({
            pipeline, so the tokens are injected explicitly instead. */
         const TOKEN_SLOT = "@@TOKENS@@";
         const LUNA_SLOT = "@@LUNA@@";
+        const DARK_SLOT = "@@DARK@@";
+        const DARK_VAR_SLOT = "@@DARKVARS@@";
         const buildStylesheet = () => STYLESHEET
             .split(TOKEN_SLOT).join(declarations(WIN2000_TOKENS))
-            .split(LUNA_SLOT).join(declarations(LUNA_TOKENS));
+            .split(LUNA_SLOT).join(declarations(LUNA_TOKENS))
+            .split(DARK_SLOT).join(declarations(DARK_TOKENS))
+            .split(DARK_VAR_SLOT).join(DARK_VARS);
 
         const STYLESHEET = `
 body[data-dsh-skin="win2000"]{${TOKEN_SLOT}
@@ -537,10 +642,75 @@ body[data-dsh-skin="win2000"] [class*="iconButton"] svg,body[data-dsh-skin="win2
 body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[aria-current="true"],[class*="_selected"]) *,
 body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[aria-current="true"],[class*="_selected"]) svg,
 body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"],[data-selected="true"],[aria-current="true"],[class*="_selected"]) svg *{color:#EDEDED !important}
+
+/* Dark mode keeps the geometry, the bevels and the navy selection; only the paint
+   changes. The mirrored token block covers every surface DSH draws from a token; the
+   rules below cover the colours this sheet hardcodes, and every one of them reads a
+   step of the derived ladder instead of a literal: surface, face, light and shadow
+   keep the light palette's own spacing, paper is the field colour. */
+body[data-dsh-skin="win2000"][data-dsh-skin-dark]{@@DARK@@}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark]{@@DARKVARS@@;--dsh-skin-sheen:#A6CAF01f;--dsh-skin-shadow-raised:inset 1px 1px 0 var(--dsh-dark-light),inset -1px -1px 0 #000000,inset 2px 2px 0 var(--dsh-dark-face),inset -2px -2px 0 var(--dsh-dark-shadow);--dsh-skin-shadow-sunken:inset 1px 1px 0 var(--dsh-dark-shadow),inset -1px -1px 0 var(--dsh-dark-light),inset 2px 2px 0 #000000,inset -2px -2px 0 var(--dsh-dark-face);--dsh-skin-shadow-active:inset 1px 1px 0 #000000,inset -1px -1px 0 var(--dsh-dark-light),inset 2px 2px 0 var(--dsh-dark-shadow),inset -2px -2px 0 var(--dsh-dark-face);background-color:var(--dsh-dark-surface) !important;color:#EDEDED !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] *::selection{background:#26418C !important;color:#EDEDED !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] :is(button,summary):not([aria-selected="true"]):not([aria-current="true"]):not([data-selected="true"]):not([class*="_selected"]){color:#EDEDED !important;background:var(--dsh-dark-surface) !important;box-shadow:var(--dsh-skin-shadow-raised)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] :is(button,summary):hover{box-shadow:var(--dsh-skin-shadow-raised),inset 0 0 0 100px var(--dsh-skin-sheen)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] :is(button,summary):active,body[data-dsh-skin="win2000"][data-dsh-skin-dark] button[aria-pressed="true"]{box-shadow:var(--dsh-skin-shadow-active),inset 0 0 0 100px var(--dsh-skin-sheen)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] :is(button,summary):focus-visible{outline:1px dotted #EDEDED;outline-offset:-4px}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] :is(input,textarea,select,[role="textbox"],[contenteditable="true"]){background:var(--dsh-dark-paper) !important;color:#EDEDED !important;box-shadow:var(--dsh-skin-shadow-sunken)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] :is([role="dialog"],[role="alertdialog"]){box-shadow:var(--dsh-skin-shadow-raised)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] :is(pre,table,fieldset){box-shadow:var(--dsh-skin-shadow-sunken)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] :is([role="button"],[role="tab"],[role="option"],[role="menuitem"]):not([aria-pressed="true"]):not([aria-selected="true"]):not([aria-current="true"]):not([data-selected="true"]):not([class*="_selected"]){background:var(--dsh-dark-surface) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] blockquote{border-left-color:var(--dsh-dark-light) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] input[type="checkbox"],body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-check] input{background:var(--dsh-dark-paper) !important;box-shadow:var(--dsh-skin-shadow-sunken) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] input[type="checkbox"]:checked,body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-check] input:checked{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='7' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M7 0H6v1H5v1H4v1H3v1H2V3H1V2H0v3h1v1h1v1h1V6h1V5h1V4h1V3h1V0z' fill='%23EDEDED'/%3E%3C/svg%3E") !important;background-position:center !important;background-repeat:no-repeat !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] *::-webkit-scrollbar-track{background:var(--dsh-dark-surface);box-shadow:var(--dsh-skin-shadow-sunken)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] *::-webkit-scrollbar-thumb{background:var(--dsh-dark-surface);background-clip:border-box !important;border:0 !important;box-shadow:inset 1px 1px 0 var(--dsh-dark-light),inset -1px -1px 0 #000000,inset 2px 2px 0 var(--dsh-dark-face),inset -2px -2px 0 var(--dsh-dark-shadow)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] *::-webkit-scrollbar-thumb:hover{background:var(--dsh-dark-face)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] *::-webkit-scrollbar-thumb:active{background:var(--dsh-dark-pressed);box-shadow:var(--dsh-skin-shadow-sunken)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] *::-webkit-scrollbar-corner{background:var(--dsh-dark-surface)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] *::-webkit-scrollbar-button{background-color:var(--dsh-dark-surface);box-shadow:inset 1px 1px 0 var(--dsh-dark-light),inset -1px -1px 0 #000000,inset 2px 2px 0 var(--dsh-dark-face),inset -2px -2px 0 var(--dsh-dark-shadow)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] *::-webkit-scrollbar-button:vertical:start{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M8 5H7v1H6v1H5v1H4v1h8V9h-1V8h-1V7H9V6H8V5z' fill='%23EDEDED'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] *::-webkit-scrollbar-button:vertical:end{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='16' height='16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M11 6H4v1h1v1h1v1h1v1h1V9h1V8h1V7h1V6z' fill='%23EDEDED'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [class*="_sidebarCol"]{box-shadow:inset -1px 0 0 #000000,inset -2px 0 0 var(--dsh-dark-light) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [class$="_handle"]:hover{background:var(--dsh-dark-surface) !important;box-shadow:inset -1px 0 0 #000000,inset -2px 0 0 var(--dsh-dark-light) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [class$="_handle"][data-dragging]{background:var(--dsh-dark-pressed) !important;box-shadow:inset -1px 0 0 #000000,inset -2px 0 0 var(--dsh-dark-light) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [class*="_card"]{background:var(--dsh-dark-card) !important;color:#EDEDED !important;box-shadow:var(--dsh-skin-shadow-raised) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] :is([class*="_card"],[class*="Card"]){--changes-fill:var(--dsh-dark-fill) !important;--changes-hover:var(--dsh-dark-fill-hover) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [class*="iconButton"],body[data-dsh-skin="win2000"][data-dsh-skin-dark] [class*="IconButton"]{background:var(--dsh-dark-surface) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [class*="iconButton"] svg,body[data-dsh-skin="win2000"][data-dsh-skin-dark] [class*="IconButton"] svg{color:#EDEDED !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [class*="bubble"]{color:#EDEDED !important;background:var(--dsh-dark-bubble) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] :is([class*="_card"],[class*="hoverContent"],[class*="hoverTitle"],[class*="hoverTime"],[class*="hoverStatus"],[class*="popup"],[class*="Popover"],[role="tooltip"]){color:#EDEDED !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] :is([class*="_card"],[class*="hoverContent"],[class*="popup"],[class*="Popover"],[role="tooltip"]) :is(div,span,p,a,time,label,h1,h2,h3,h4):not([aria-selected="true"] *):not([data-selected="true"] *):not([class*="_selected"] *):not([class*="_added"]):not([class*="_deleted"]):not([class*="_sign"]){color:#EDEDED !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-panel]{background:var(--dsh-dark-surface) !important;color:#EDEDED !important;box-shadow:var(--dsh-skin-shadow-raised) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-panel] > button{color:#EDEDED !important;background:var(--dsh-dark-surface) !important;box-shadow:var(--dsh-skin-shadow-raised) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-panel] > button:hover{box-shadow:var(--dsh-skin-shadow-raised),inset 0 0 0 100px var(--dsh-skin-sheen) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-panel] > button:active,body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-panel] > button[aria-pressed="true"]{background:#0A246A !important;color:#EDEDED !important;box-shadow:var(--dsh-skin-shadow-active) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-panel] > button[disabled]{color:var(--dsh-dark-muted);background:var(--dsh-dark-surface) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-panel] > button span[data-dsh-skin-mark]{background:var(--dsh-dark-paper);box-shadow:var(--dsh-skin-shadow-sunken) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-panel] > button[aria-pressed="true"] span[data-dsh-skin-mark]:not([style*="background"]){background-color:var(--dsh-dark-paper) !important;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='7' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M7 0H6v1H5v1H4v1H3v1H2V3H1V2H0v3h1v1h1v1h1V6h1V5h1V4h1V3h1V0z' fill='%23EDEDED'/%3E%3C/svg%3E") !important;background-position:center !important;background-repeat:no-repeat !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-panel] hr{border-top-color:#000000;border-bottom-color:var(--dsh-dark-light)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-panel] [data-dsh-skin-title]{color:#EDEDED}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-panelbar] [data-dsh-skin-fold]{color:#EDEDED;background:var(--dsh-dark-surface);box-shadow:var(--dsh-skin-shadow-raised)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-panelbar] [data-dsh-skin-fold]:active{box-shadow:var(--dsh-skin-shadow-active)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window]{background:var(--dsh-dark-surface);color:#EDEDED;box-shadow:var(--dsh-skin-shadow-raised)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-client]{background:var(--dsh-dark-surface);color:#EDEDED;box-shadow:var(--dsh-skin-shadow-sunken)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-input]{background:var(--dsh-dark-paper);color:#EDEDED;box-shadow:var(--dsh-skin-shadow-sunken)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-label],body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-check]{color:#EDEDED}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-menubar] button{color:#EDEDED}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-menu]{background:var(--dsh-dark-surface);box-shadow:var(--dsh-skin-shadow-raised)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-menu] button{color:#EDEDED}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-titlebtn]{background-color:var(--dsh-dark-surface) !important;box-shadow:inset 1px 1px 0 var(--dsh-dark-light),inset -1px -1px 0 #000000,inset 2px 2px 0 var(--dsh-dark-face),inset -2px -2px 0 var(--dsh-dark-shadow) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-titlebtn][aria-label="最小化"],body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-titlebtn="min"]{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='6' height='2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23EDEDED' d='M0 0h6v2H0z'/%3E%3C/svg%3E") !important;background-position:bottom 3px left 4px !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-titlebtn][aria-label="最大化"],body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-titlebtn="max"]{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='9' height='9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M9 0H0v9h9V0zM8 2H1v6h7V2z' fill='%23EDEDED'/%3E%3C/svg%3E") !important;background-position:top 2px left 3px !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-titlebtn][aria-label="关闭"],body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-titlebtn="close"]{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg width='8' height='7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z' fill='%23EDEDED'/%3E%3C/svg%3E") !important;background-position:top 3px left 4px !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-titlebtn]:active,body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-titlebtn][aria-pressed="true"]{box-shadow:inset 1px 1px 0 #000000,inset -1px -1px 0 var(--dsh-dark-light),inset 2px 2px 0 var(--dsh-dark-shadow),inset -2px -2px 0 var(--dsh-dark-face) !important}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-status] span{color:#EDEDED;box-shadow:var(--dsh-skin-shadow-sunken)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-actions] button{background:var(--dsh-dark-surface);color:#EDEDED;box-shadow:var(--dsh-skin-shadow-raised)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-actions] button:active{box-shadow:var(--dsh-skin-shadow-active)}
+body[data-dsh-skin="win2000"][data-dsh-skin-dark] [data-dsh-skin-window] [data-dsh-skin-actions] button:focus-visible{outline:1px dotted #EDEDED;outline-offset:-4px}
 `;
 
 
-        /** Remembered choices, all optional: no entry means the skin on, CJKV18 face on. */
+        /** Remembered choices, all optional: no entry means the skin on, CJKV18 face on, dark mode off. */
         const readSettings = () => {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
@@ -549,15 +719,16 @@ body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"
                     enabled: parsed.enabled !== false,
                     variant: "luna",
                     pixel: parsed.pixel !== false,
+                    dark: parsed.dark === true,
                 };
             } catch {
-                return { enabled: true, variant: "luna", pixel: true };
+                return { enabled: true, variant: "luna", pixel: true, dark: false };
             }
         };
 
         const writeSettings = (settings) => {
             try {
-                if (settings.enabled && settings.pixel) localStorage.removeItem(STORAGE_KEY);
+                if (settings.enabled && settings.pixel && !settings.dark) localStorage.removeItem(STORAGE_KEY);
                 else localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
             } catch {
                 /* Storage unavailable (private mode): the choices still hold for this page. */
@@ -581,12 +752,18 @@ body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"
                 } else {
                     body.removeAttribute("data-dsh-skin-pixel");
                 }
+                if (settings.dark) {
+                    body.setAttribute("data-dsh-skin-dark", SKIN_VALUE);
+                } else {
+                    body.removeAttribute("data-dsh-skin-dark");
+                }
             } else {
                 body.removeAttribute(SKIN_ATTRIBUTE);
                 body.removeAttribute("data-dsh-skin-variant");
                 body.removeAttribute("data-dsh-skin-pixel");
+                body.removeAttribute("data-dsh-skin-dark");
             }
-            document.documentElement.style.colorScheme = settings.enabled ? "light" : "";
+            document.documentElement.style.colorScheme = settings.enabled ? (settings.dark ? "dark" : "light") : "";
             writeSettings(settings);
         }
 
@@ -980,6 +1157,13 @@ body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"
                     "aria-pressed": settings.enabled && settings.pixel ? "true" : "false",
                     onClick: () => { update({ pixel: !settings.pixel }); },
                 }, React.createElement("span", { "data-dsh-skin-mark": "" }), "点阵字体"),
+                React.createElement("button", {
+                    key: "dark",
+                    type: "button",
+                    disabled: !settings.enabled,
+                    "aria-pressed": settings.enabled && settings.dark ? "true" : "false",
+                    onClick: () => { update({ dark: !settings.dark }); },
+                }, React.createElement("span", { "data-dsh-skin-mark": "" }), "暗色模式"),
                 React.createElement("hr", { key: "rule" }),
                 React.createElement("button", {
                     key: "specimen",
@@ -1014,7 +1198,7 @@ body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"
                 project(readSettings());
                 return () => {
                     tag.remove();
-                    project({ enabled: false, variant: "luna", pixel: false });
+                    project({ enabled: false, variant: "luna", pixel: false, dark: false });
                     try {
                         localStorage.removeItem(STORAGE_KEY);
                     } catch {
