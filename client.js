@@ -817,6 +817,12 @@ body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"
             const drag = React.useRef(null);
             /** Set when a gesture was a drag, so its trailing click is ignored. */
             const dragged = React.useRef(false);
+            /** The panel root of the current stage, measured after a stage change. */
+            const panelRef = React.useRef(null);
+            /** Latest ui, for callbacks that run after this render, such as the
+             *  repositioning frame. Reading `ui` there would merge a stale stage. */
+            const uiRef = React.useRef(ui);
+            uiRef.current = ui;
 
             const update = (patch) => {
                 const next = { ...settings, ...patch };
@@ -867,23 +873,53 @@ body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"
                 dragged.current = true;
             };
 
-            // Viewport clamping: ensures panel never falls off the screen when expanded or moved
-            const panelHeight = ui.stage === 0 ? 240 : 24;
-            const panelWidth = 160;
+            // Viewport clamping keeps the panel on screen. Sizes are measured from the
+            // stage actually rendered, not assumed, so a stage change cannot push the
+            // panel off the edge after the fact.
+            const sizeRef = React.useRef({ w: 156, h: 135 });
+            const viewport = () => ({
+                w: typeof window !== "undefined" && window.innerWidth ? window.innerWidth : 1280,
+                h: typeof window !== "undefined" && window.innerHeight ? window.innerHeight : 800,
+            });
+            const clampLeft = (value, width) => Math.max(8, Math.min(value, viewport().w - width - 8));
+            const clampTop = (value, height) => Math.max(8, Math.min(value, viewport().h - height - 8));
             let safeX = ui.x;
             let safeY = ui.y;
-            if (safeX !== null) safeX = Math.max(8, Math.min(safeX, (typeof window !== "undefined" ? window.innerWidth : 1200) - panelWidth - 8));
-            if (safeY !== null) safeY = Math.max(8, Math.min(safeY, (typeof window !== "undefined" ? window.innerHeight : 800) - panelHeight - 8));
+            if (safeX !== null) safeX = clampLeft(safeX, sizeRef.current.w);
+            if (safeY !== null) safeY = clampTop(safeY, sizeRef.current.h);
             const style = safeX === null || safeY === null ? undefined : { left: safeX + "px", top: safeY + "px", right: "auto", bottom: "auto" };
 
             /** 0 -> 1 -> 2 -> 0: full, title bar, single plus. */
-            const cycleStage = () => {
+            /**
+             * Cycle the stage with the toggle button pinned to the pointer that clicked
+             * it: the control stays under the cursor whatever the stage, so the panel
+             * grows and shrinks around it instead of sliding sideways.
+             */
+            const cycleStage = (event) => {
+                const point = typeof event?.clientX === "number" && typeof event?.clientY === "number"
+                    ? { x: event.clientX, y: event.clientY }
+                    : null;
                 const next = (ui.stage + 1) % 3;
-                let nextY = ui.y;
-                if (next === 0 && ui.y !== null && typeof window !== "undefined") {
-                    nextY = Math.max(8, Math.min(ui.y, window.innerHeight - 250));
-                }
-                chrome({ stage: next, y: nextY });
+                // The stage change must survive the repositioning below: `ui` in this
+                // closure is the pre-click render, so merges read the latest value.
+                uiRef.current = { ...ui, stage: next };
+                chrome({ stage: next });
+                if (point === null || typeof requestAnimationFrame !== "function") return;
+                requestAnimationFrame(() => {
+                    const node = panelRef.current;
+                    if (node === null) return;
+                    const button = node.querySelector("[data-dsh-skin-fold]");
+                    if (button === null) return;
+                    const panelRect = node.getBoundingClientRect();
+                    const buttonRect = button.getBoundingClientRect();
+                    sizeRef.current = { w: panelRect.width, h: panelRect.height };
+                    const x = clampLeft(panelRect.left + point.x - (buttonRect.left + buttonRect.width / 2), panelRect.width);
+                    const y = clampTop(panelRect.top + point.y - (buttonRect.top + buttonRect.height / 2), panelRect.height);
+                    if (Math.abs(x - panelRect.left) < 1 && Math.abs(y - panelRect.top) < 1) return;
+                    const nextUi = { ...uiRef.current, x: Math.round(x), y: Math.round(y) };
+                    setUi(nextUi);
+                    writeUi(nextUi);
+                });
             };
 
             const titleBar = React.createElement("div", {
@@ -905,17 +941,17 @@ body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"
             }, ui.stage === 0 ? "\u2013" : "\u002b"));
 
             if (ui.stage === 2) {
-                return React.createElement("div", { "data-dsh-skin-panel": "", "data-dsh-skin-mini": "", style },
+                return React.createElement("div", { "data-dsh-skin-panel": "", "data-dsh-skin-mini": "", style, ref: panelRef },
                     React.createElement("button", {
                         type: "button",
                         "data-dsh-skin-fold": "",
                         title: "展开设置",
-                        onClick: () => {
+                        onClick: (event) => {
                             if (dragged.current) {
                                 dragged.current = false;
                                 return;
                             }
-                            cycleStage();
+                            cycleStage(event);
                         },
                         onPointerDown: (event) => { onPointerDown(event, true); },
                         onPointerMove,
@@ -925,7 +961,7 @@ body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"
             }
 
             if (ui.stage === 1) {
-                return React.createElement("div", { "data-dsh-skin-panel": "", "data-dsh-skin-folded": "", style }, titleBar);
+                return React.createElement("div", { "data-dsh-skin-panel": "", "data-dsh-skin-folded": "", style, ref: panelRef }, titleBar);
             }
 
             const rows = [
@@ -951,7 +987,7 @@ body[data-dsh-skin="win2000"][data-dsh-skin="win2000"] :is([aria-selected="true"
                     onClick: () => { setSpecimen(!specimen); },
                 }, React.createElement("span", { "data-dsh-skin-mark": "" }), "窗口示例"),
             ];
-            return React.createElement("div", { "data-dsh-skin-panel": "", style },
+            return React.createElement("div", { "data-dsh-skin-panel": "", style, ref: panelRef },
                 titleBar,
                 ...rows,
                 specimen ? React.createElement(ClassicWindow, { key: "window" }) : null);

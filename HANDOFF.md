@@ -160,7 +160,7 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 | `dsh.skin.win2000.window` | `{ x, y }`——窗口示例拖到的视口坐标；键不存在 = CSS 默认（居中，`left:50%` + `translateX(-50%)`） |
 
 - **默认：皮肤开启 + 点阵字体开启**。
-- **面板三档循环**：标题栏右侧按钮点击循环 0→1→2→0；**最小档的小 ＋ 本身也是拖动把手**，拖动超过 3px 只记位置、**不换档**（坑 19）。
+- **面板三档循环**：标题栏右侧按钮点击循环 0→1→2→0；**最小档的小 ＋ 本身也是拖动把手**，拖动超过 3px 只记位置、**不换档**（坑 19）。换档时以**点击处的鼠标坐标**为准：`requestAnimationFrame` 里量出新档按钮的中心，反推面板 `x/y` 写回，所以不管怎么缩，开关都停在点击的位置（坑 36）。
 - **双击标题栏**把面板位置重置回右下角。
 - **窗口示例**：标题栏按住即可拖到视口任意位置（pointer capture，和面板同一套手势），拖动时按窗口实际宽高夹在视口内；`pointerup` 才写 localStorage。**双击标题栏或点 `□`** 最大化 —— 内联 `left/top/right/bottom:0` + `width/height:auto` 铺满视口；再双击或再点一次还原，**回到原来拖到的坐标**，不会位移。最大化期间标题栏拖动被忽略，避免把铺满的窗口拖歪。
 - 关闭皮肤 = 移除三个属性、释放 `color-scheme`；面板与窗口因自包含而**保持 2000 外观**。
@@ -208,6 +208,7 @@ D:\Desktop\fuck\DSH\                 ← 仓库根 = npm 包根 = junction 目�
 | 34 | **升级 DSH 后皮肤不出现，配置里却看得到** | DSH 0.2.0 起宿主端先查 profile 的 `dependencies`；本插件当初只用 junction + patch 行挂载，没登记 → 行被静默跳过，客户端清单里没有它 | `dsh plugin --profile web add link:<仓库路径>` 登记依赖（会写进 profile 的 package.json，`link:` 形式仍指向仓库），然后**重启 DSH**（清单在启动时算）。确认方法：解析首页 `__DSH_BOOT__` 的 entries，看有没有 `dsh-skin-win2000` |
 | 35 | **深蓝高亮里的文字还是黑的** | 兜底选择器只认 `aria-selected` / `data-selected` / `class*="_selected"`，而 DSH 设置页的导航用 **`aria-current="true"`** 标记当前项 —— 第四类标记漏了 | 三条选中态规则 + 三条兜底规则全部加上 `[aria-current="true"]`。诊断用 `tools/inspect-settings-highlight.mjs`：它会打开设置页、列出所有深蓝元素并报出里面的黑色后代 |
 | 33 | `git add -A` 把提交消息文件卷进仓库 | 消息写在仓库内的临时 `.txt`，`add -A` 一并暂存。**已踩两次** | 消息文件写进 `$env:TEMP`，或把文件名加进 `.gitignore` |
+| 36 | **面板换档后档位自己跳回去、面板莫名上移** | 换档后 `requestAnimationFrame` 里的回调闭包捕获的是**点击前那次渲染**的 `ui`，其中 `chrome({x,y})` 展开旧 `ui`，把刚写入的 `stage` 又写回旧值；视口钳制同时按写死的 240px 估面板高度，展开时把面板顶到上面 | 用 `uiRef` 保存最新 `ui` 再合并；面板宽高一律用 `getBoundingClientRect()` 实测后再钳制。验证脚本 `tools/probe-panel-fold.mjs` 在真实界面里连点三次，断言按钮中心偏移 ≤2px |
 | 24 | PowerShell 吃掉/误解脚本内容 | here-string 里的反引号、引号、`!` 会被解析 | **用 `write` 工具写脚本文件**，再 `node 脚本` 执行；提交消息用 `git commit -F 文件` |
 
 ---
