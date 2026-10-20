@@ -22,19 +22,19 @@ Classic grey controls, two-tone gradient title bars, 1px bevels, hard square cor
 
 ### The interface — grey chrome, navy selection, corner panel
 
-![Main window](docs/screenshots/01-main-window.png)
+![Main window](https://raw.githubusercontent.com/lildanger/dsh-skin-win2000/main/docs/screenshots/01-main-window.png)
 
 ### The classic window — gradient title bar, menu bar, sunken fields and status bar
 
-![Classic window](docs/screenshots/02-classic-window.png)
+![Classic window](https://raw.githubusercontent.com/lildanger/dsh-skin-win2000/main/docs/screenshots/02-classic-window.png)
 
 ### The settings surface — form controls, switches and lists
 
-![Settings](docs/screenshots/03-settings.png)
+![Settings](https://raw.githubusercontent.com/lildanger/dsh-skin-win2000/main/docs/screenshots/03-settings.png)
 
 ### Dark mode — the same metrics and bevels on a dark paint, switched from the panel
 
-![Dark mode](docs/screenshots/04-dark.png)
+![Dark mode](https://raw.githubusercontent.com/lildanger/dsh-skin-win2000/main/docs/screenshots/04-dark.png)
 
 ---
 

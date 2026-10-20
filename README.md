@@ -22,19 +22,19 @@
 
 ### 整体界面 —— 灰底、深蓝选中、右下角皮肤面板
 
-![主界面](docs/screenshots/01-main-window.png)
+![主界面](https://raw.githubusercontent.com/lildanger/dsh-skin-win2000/main/docs/screenshots/01-main-window.png)
 
 ### 经典窗口 —— 渐变标题栏、菜单栏、凹陷输入框与状态栏
 
-![经典窗口](docs/screenshots/02-classic-window.png)
+![经典窗口](https://raw.githubusercontent.com/lildanger/dsh-skin-win2000/main/docs/screenshots/02-classic-window.png)
 
 ### 设置界面 —— 表单控件、开关与列表上的皮肤
 
-![设置界面](docs/screenshots/03-settings.png)
+![设置界面](https://raw.githubusercontent.com/lildanger/dsh-skin-win2000/main/docs/screenshots/03-settings.png)
 
 ### 暗色界面 —— 面板里打开「暗色模式」，度量表和立体边框原样保留
 
-![暗色界面](docs/screenshots/04-dark.png)
+![暗色界面](https://raw.githubusercontent.com/lildanger/dsh-skin-win2000/main/docs/screenshots/04-dark.png)
 
 ---
 

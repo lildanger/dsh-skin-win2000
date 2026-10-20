@@ -3,7 +3,7 @@
 DSH Web GUI 的 Windows 2000 皮肤插件。单文件客户端 bundle，无构建步骤。
 
 **仓库**：<https://github.com/lildanger/dsh-skin-win2000>（public）
-**npm**：<https://www.npmjs.com/package/dsh-skin-win2000>（当前 `1.3.0`）
+**npm**：<https://www.npmjs.com/package/dsh-skin-win2000>（当前 `1.3.1`）
 
 ---
 
